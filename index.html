@@ -525,6 +525,8 @@ button.dlog:hover{filter:brightness(1.06)}button.dlog:active{transform:translate
 .dlog.on{background:#EEF0FF;color:var(--ink);box-shadow:inset 0 0 0 2px #C9CEFB}.dlog.on .dl{color:#5865F2}
 .dlog.on .dn2{font-family:var(--body);font-weight:800;font-size:var(--t-sm);text-transform:none;letter-spacing:0;text-shadow:none;color:var(--ink2)}
 .dlog.on .dn2 b{font-family:var(--display);font-weight:400;font-size:20px;color:var(--ink)}
+.gate{text-align:center;justify-items:center}.gate .dlog{max-width:420px}.gate .gsafe{display:flex;align-items:center;gap:6px;justify-content:center}.gate .gsafe .i{width:14px;height:14px}
+.gwait{display:flex;align-items:center;gap:12px;padding:10px;font-family:var(--display);font-size:22px}
 .join.hl{border-color:var(--yellow);box-shadow:0 0 0 4px rgba(255,210,63,.35);animation:pop .4s var(--spring)}
 .ghrow{display:flex;align-items:center;gap:8px;background:var(--paper);border:2px solid var(--line);border-radius:var(--r-sm);padding:4px 4px 4px 10px}
 .ghrow .ghi{width:20px;height:20px;color:var(--ink);flex:none}.ghrow .ghi svg{width:100%;height:100%}
@@ -1234,6 +1236,18 @@ function homeView(){
       <div class="press">Appuie pour jouer</div><p class="tfoot">Un plateau de Paris fait maison · 2 à 6 joueurs</p></div>`;
     const go=e=>{if(e&&e.type==='keydown'&&['Tab','Shift','Alt','Control','Meta'].includes(e.key))return;window.removeEventListener('keydown',go);TITLE=false;audioInit();SFX.play('start');MUSIC.want('menu');H.classList.add('fadein');homeView()};
     H.querySelector('.title').onclick=go;if(homeView.tgo)window.removeEventListener('keydown',homeView.tgo);homeView.tgo=go;window.addEventListener('keydown',go);return}
+  // version site : connexion Discord obligatoire
+  if(SITE&&!DISCORD.me){
+    const wait=!!DISCORD.pending;const inv=(location.hash.match(/join=([A-Za-z]{4})/)||[])[1];
+    H.innerHTML=deco+`<div class="hero"><span class="logo mlogo"><small>Jeu de propriétés</small>Le Grand Paris</span></div>
+    <section class="card gate">${wait?`<div class="gwait"><span class="spin"></span><b>Connexion à Discord…</b></div>`:`
+      <h2>${inv?'Un pote t’invite à jouer !':'Bienvenue !'}</h2>
+      <p class="note">Connecte-toi avec ton compte Discord pour jouer : ton pseudo et ta photo de profil seront utilisés automatiquement dans la partie.</p>
+      ${discordBlock()}
+      <p class="note gsafe">${ico('lock')}Le jeu ne lit que ton pseudo et ta photo. Rien d’autre, et rien n’est publié sur Discord.</p>`}</section>`;
+    const a=document.getElementById('dlogin');if(a)a.onclick=()=>DISCORD.login();
+    if(wait)DISCORD.pending.finally(()=>{DISCORD.pending=null;homeView()});
+    return}
   if(mode==='online'&&!S){ // salon d'attente
     const ps=groom?groom.peers().filter(x=>x.presence&&x.presence.n).slice().sort((a,b)=>(a.presence.j||0)-(b.presence.j||0)).slice(0,6):[];
     // pion et couleur de chacun : le sien, sinon le premier libre
