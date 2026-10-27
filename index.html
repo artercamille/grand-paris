@@ -618,6 +618,59 @@ button.dlog:hover{filter:brightness(1.06)}button.dlog:active{transform:translate
 
 .timer.afk{margin-top:8px}.sumline.bank{font-weight:700;font-size:var(--t-sm);margin-top:-4px}.sumline.bank em{color:var(--red);font-style:normal;font-weight:900}
 .tchip.gojc i{background:#F7941D!important}
+
+/* ---------- HUD minimaliste (v30) : pastilles joueurs, infos au survol ---------- */
+.topc{left:auto;right:calc(14px + env(safe-area-inset-right,0px));transform:none;gap:6px}
+.topc .chip{padding:5px 10px;font-size:13px;gap:5px}.topc .chip .i{width:15px;height:15px}
+.rail{inset:auto;left:calc(16px + env(safe-area-inset-left,0px));top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:24px;z-index:4}
+.orb{--pc:#888;position:relative;width:62px;height:62px;display:grid;place-items:center;pointer-events:auto;cursor:pointer;border-radius:50%;transition:transform .3s var(--spring),filter .3s,opacity .3s;outline:none}
+.orb .ring{position:absolute;left:-2px;top:-2px;width:66px;height:66px;transform:rotate(-90deg);overflow:visible;pointer-events:none}
+.orb .ring circle{fill:none;stroke-width:4.5}
+.orb .ring .tr{stroke:rgba(255,255,255,.32)}
+.orb .ring .fl{stroke:var(--pc);stroke-linecap:round;transition:stroke-dasharray 1s cubic-bezier(.3,.9,.3,1)}
+.orb>.av{width:50px!important;height:50px!important;box-shadow:0 4px 10px rgba(0,0,0,.32)!important;animation:none!important}
+.orb:hover{transform:scale(1.08)}
+.orb.cur{transform:scale(1.2)}
+.orb.cur::before{content:'';position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--pc) 70%,transparent) 0,transparent 68%);animation:orbglow 1.6s ease-in-out infinite;z-index:-1;pointer-events:none}
+@keyframes orbglow{0%,100%{transform:scale(.92);opacity:.9}50%{transform:scale(1.12);opacity:.45}}
+.orb .crown{position:absolute;top:-17px;left:50%;transform:translateX(-50%) rotate(-10deg);display:none;pointer-events:none;filter:drop-shadow(0 2px 0 rgba(0,0,0,.35))}
+.orb.lead .crown{display:block}.orb .crown .i{width:22px;height:22px;color:#8A5A00;fill:#FFD23F}
+.orb .stt{position:absolute;right:-5px;bottom:-3px;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;border:2px solid #fff;pointer-events:none}.orb .stt[hidden]{display:none}.orb .stt .i{width:12px;height:12px}
+.orb .me{position:absolute;bottom:-11px;left:50%;transform:translateX(-50%);font-family:var(--display);font-size:10.5px;line-height:1;padding:2px 6px 3px;border-radius:var(--r-pill);background:#fff;color:var(--ink);box-shadow:0 2px 0 rgba(0,0,0,.25);text-transform:uppercase;letter-spacing:.06em;pointer-events:none}
+.orb.out{filter:grayscale(1);opacity:.45}.orb.off>.av{opacity:.5}
+.orb .ocard{position:absolute;left:calc(100% + 16px);top:50%;transform:translate(-10px,-50%) scale(.95);transform-origin:left center;opacity:0;visibility:hidden;pointer-events:none;width:232px;padding:12px 14px 10px;border-radius:var(--r-lg);background:rgba(255,253,247,.97);color:var(--ink);box-shadow:0 16px 36px rgba(10,14,28,.32),inset 0 0 0 3px var(--pc);transition:opacity .16s,transform .24s var(--spring),visibility 0s .2s;display:grid;gap:6px;z-index:6;text-align:left;cursor:default}
+.orb .ocard::before{content:'';position:absolute;left:-9px;top:50%;margin-top:-9px;border:9px solid transparent;border-left:0;border-right-color:var(--pc)}
+.orb:hover .ocard,.orb:focus-visible .ocard{opacity:1;visibility:visible;transform:translate(0,-50%) scale(1);transition:opacity .16s,transform .24s var(--spring),visibility 0s}
+.ocard .oh{display:flex;align-items:center;gap:6px;min-width:0}.ocard .pn{font-family:var(--display);font-size:20px;line-height:1.05;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.ocard .botc{background:var(--ink)}
+.ocard .rk{margin-left:auto;flex:none;font-family:var(--display);font-size:13px;padding:3px 8px;border-radius:var(--r-pill);background:var(--pc);color:#fff}.ocard .rk:empty{display:none}
+.ocard .pm{display:flex;align-items:center;gap:6px;font-family:var(--display);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}.ocard .pm small{font-size:18px;opacity:.55}.ocard .pm.neg{color:var(--red)}
+.ocard .ow{font-size:var(--t-xs);font-weight:800;color:var(--ink2)}.ocard .ow:empty{display:none}
+.ocard .pg{display:flex;gap:4px;flex-wrap:wrap}.ocard .none{font-size:var(--t-xs);font-weight:800;color:var(--muted)}
+.ocard .bdg{display:flex;gap:4px;flex-wrap:wrap}.ocard .bdg:empty{display:none}.ocard .bdg span{font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:var(--ink);color:#fff;border-radius:var(--r-pill);padding:2px 7px}
+.ocard .oft{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:var(--muted);border-top:1px solid var(--line);padding-top:6px;margin-top:2px}.ocard .oft .i{width:13px;height:13px}
+.orb .delta{right:auto;left:calc(100% + 4px);top:6px;font-size:24px;white-space:nowrap}
+.orb:hover .delta{opacity:0}
+.orb .react{left:50%!important;top:-30px;bottom:auto;margin-left:-19px}
+/* fil : une seule ligne qui s'efface */
+.feed{top:calc(14px + env(safe-area-inset-top,0px));width:min(460px,calc(100% - 320px))}
+.feed>div{transition:opacity .6s,transform .6s}.feed>div.bye{opacity:0;transform:translateY(-8px)}
+/* outils : icônes rondes avec bulle */
+.tb{gap:8px}
+.tool{position:relative;width:46px;height:46px;padding:0;justify-content:center;border-radius:50%}
+.tool .i{width:20px;height:20px}
+.tool .c{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;display:grid;place-items:center;padding:0 5px;font-size:11px;border:2px solid #fff}
+.tool[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translate(-50%,4px);background:var(--ink);color:#fff;font-size:12px;font-weight:900;white-space:nowrap;padding:4px 9px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
+.tool[data-tip]:hover::after,.tool[data-tip]:focus-visible::after{opacity:1;transform:translate(-50%,0)}
+body.intro .rail{opacity:0;pointer-events:none}
+@media (max-width:860px){
+  .rail{position:absolute;top:calc(20px + env(safe-area-inset-top,0px));left:12px;right:auto;transform:none;flex-direction:row;gap:12px;overflow:visible;padding:0}
+  .orb{width:46px;height:46px}.orb .ring{width:50px;height:50px}.orb>.av{width:38px!important;height:38px!important}
+  .orb .ocard{display:none}.orb.cur{transform:scale(1.12)}
+  .orb .delta{left:50%;top:calc(100% + 6px);transform:translateX(-50%);font-size:18px}
+  .topc{top:calc(12px + env(safe-area-inset-top,0px));bottom:auto}
+  .topc #rndchip,.topc #potchip{position:static}
+}
 </style>
 
 <main id="home" lang="fr"></main>
@@ -626,9 +679,9 @@ button.dlog:hover{filter:brightness(1.06)}button.dlog:active{transform:translate
     <canvas id="gl" aria-label="Plateau de jeu en 3D"></canvas>
     <div class="hud">
       <div class="tags" id="tags"></div>
-      <div class="plates" id="plates"></div>
+      <div class="plates rail" id="plates"></div>
       <div class="topc">
-        <span class="logo">Le Grand Paris</span><span class="chip" id="roomchip"></span><span class="chip" id="rndchip"></span><span class="chip" id="potchip" hidden></span>
+        <span class="chip" id="roomchip" hidden></span><span class="chip" id="rndchip" hidden></span><span class="chip" id="potchip" hidden></span>
         <button class="ib" id="gear" type="button" aria-label="Menu pause"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       </div>
       <div hidden><button id="amb" type="button"></button><button id="qual" type="button"></button><button id="photo" type="button"></button></div>
@@ -2526,7 +2579,7 @@ function buildBoard(){
   const tagBox=document.getElementById('tags');
   const updateTags=()=>{const w=cv.clientWidth,h=cv.clientHeight,v=new THREE.Vector3();
     G.pawns.forEach((p,k)=>{if(!p.tag){p.tag=document.createElement('div');p.tag.className='ptag';tagBox.appendChild(p.tag)}
-      const P=S.players[k];if(!P||P.out||!p.obj.visible){p.tag.hidden=true;return}
+      const P=S.players[k];if(!P||P.out||!p.obj.visible||!((p.path&&!p.direct&&!(p.wait>0))||G.hopK===k)){p.tag.hidden=true;return}
       const im=typeof pimg==='function'?pimg(k):null,html=(im?`<img class="tav" src="${im}" alt="" style="border-color:${P.c}">`:`<span class="dot" style="background:${P.c}"></span>`)+esc(P.n)+(p.path&&!p.direct&&p.path.length?`<b class="stepc">${p.path.length}</b>`:'');if(p.tag._h!==html){p.tag.innerHTML=html;p.tag._h=html}
       v.copy(p.obj.position);v.y+=.72;v.project(camera);if(v.z>1){p.tag.hidden=true;return}p.tag.hidden=false;p.tag.classList.toggle('cur',k===S.turn);
       p._x=(v.x*.5+.5)*w;p._y=(-v.y*.5+.5)*h;p._w=p.tag.offsetWidth||80});
@@ -2923,7 +2976,7 @@ function closeOvl(){const el=ovl();el.hidden=true;el.innerHTML='';OVL.kind=null}
 /* ---------- menu pause ---------- */
 function openPause(){const el=ovl(),online=mode==='online';OVL.kind='pause';SFX.play('pop');
   el.innerHTML=`<div class="pause" role="dialog" aria-modal="true" aria-label="${online?'Menu':'Pause'}"><span class="logo ptitle">${online?'Menu':'Pause'}</span>
-    ${online?'<p class="pnote">La partie continue pour les autres joueurs.</p>':''}
+    ${online?`<p class="pnote">Salon <b>${esc(code)}</b>${isHost?' · tu es l’hôte':''} · la partie continue pour les autres.</p>`:''}
     <div class="pbtns"><button class="gb green xl" data-p="resume">${ico('play')}Reprendre</button>
       <button class="gb white" data-p="settings">${ico('sliders')}Réglages</button>
       <button class="gb white" data-p="rules">${ico('book')}Comment jouer</button>
@@ -3039,7 +3092,7 @@ setInterval(()=>{if(S&&mode==='online')renderConn()},1500);
 /* ---------- astuces de première partie ---------- */
 const TIPS1={roll:['Lance les dés','Clique ici ou appuie sur Espace pour lancer les dés et avancer.'],
   buy:['Ta première rue !','Achète-la, ou laisse-la partir aux enchères si elle ne t’intéresse pas.'],
-  plates:['Les plaques des joueurs','Argent, classement et couleurs possédées. Clique sur une plaque pour voir ses rues.'],
+  plates:['Les joueurs','Passe la souris sur une photo pour voir son argent et ses couleurs. L’anneau montre sa fortune. Clique pour voir ses rues.'],
   end:['Fin du tour','Quand tu as fini de gérer tes rues, termine ton tour ici.'],
   build:['Toute la couleur !','Ouvre Propriétés pour construire des maisons : les loyers vont exploser.']};
 const tipSeen=()=>LS.get('lgp-tips')||{};
@@ -3118,27 +3171,37 @@ function moneyMoves(ch){// ch : [{k,d,to}]
       pos.forEach(p=>{flyCoins(bankPoint(),plateCenter(p.k),`banque ${ico('arrowR','ar')} ${esc(S.players[p.k].n)} · +${fmt(p.d)} €`);land(p,820)})}};
   setTimeout(go,delayNow()*1000+250)}
 
-/* ---------- plaques joueurs ---------- */
+/* ---------- joueurs : une simple pastille photo, les infos au survol ---------- */
 function renderPlates(){
   const box=document.getElementById('plates'),me=myIdx(),{r}=ranks();
   const sig=S.gid+':'+S.players.length;
   if(UI.plateSig!==sig){UI.plateSig=sig;UI.disp={};UI.tgt={};UI.rank={};
-    box.innerHTML=S.players.map((P,k)=>`<div class="plate k${k}" data-plate="${k}" style="--pc:${P.c}" role="button" tabindex="0" aria-label="Voir les propriétés de ${esc(P.n)}"><span class="rank"></span><span class="flag">À toi !</span>${pav(k)}
-      <div class="pi"><div class="pn">${esc(P.n)}${P.bot?'<span class="botc">BOT</span>':''}</div><div class="pm"><span class="coin"></span><span class="mv"></span></div><div class="pg"></div><div class="bdg"></div></div>${k===me?'<span class="me">TOI</span>':''}</div>`).join('')}
-  const alive=S.players.filter(P=>!P.out),tie=alive.every((P,k)=>r[S.players.indexOf(P)]===1);
+    box.innerHTML=S.players.map((P,k)=>`<div class="orb" data-plate="${k}" style="--pc:${P.c}" role="button" tabindex="0" aria-label="${esc(P.n)} : voir ses infos et ses rues">
+      <svg class="ring" viewBox="0 0 64 64" aria-hidden="true"><circle class="tr" cx="32" cy="32" r="29.5"/><circle class="fl" cx="32" cy="32" r="29.5" pathLength="100" stroke-dasharray="0 100"/></svg>
+      ${pav(k)}<span class="crown">${ico('crown')}</span><span class="stt"></span>${k===me?'<span class="me">toi</span>':''}
+      <div class="ocard"><div class="oh"><b class="pn">${esc(P.n)}</b>${P.bot?'<span class="botc">BOT</span>':''}<span class="rk"></span></div>
+        <div class="pm"><span class="coin"></span><span class="mv"></span><small>€</small></div><div class="ow"></div><div class="pg"></div><div class="bdg"></div>
+        <div class="oft">${ico('house')}Clique pour voir ses rues</div></div></div>`).join('')}
+  const alive=S.players.filter(P=>!P.out),tie=alive.every(P=>r[S.players.indexOf(P)]===1),top=Math.max(1,...S.players.map((P,k)=>P.out?0:worth(k)));
+  const present=mode==='online'&&groom?new Set(groom.peers().map(x=>x.peer)):null;
   const ch=[];
   S.players.forEach((P,k)=>{const el=box.querySelector(`[data-plate="${k}"]`);if(!el)return;
-    el.classList.toggle('cur',k===S.turn&&S.phase==='play');el.classList.toggle('out',!!P.out);
-    const rk=el.querySelector('.rank');rk.className='rank r'+r[k];rk.hidden=tie&&!P.out;rk.textContent=P.out?'—':r[k]+(r[k]===1?'er':'e');
-    if(UI.rank[k]!=null&&UI.rank[k]!==r[k]&&!tie){const up=r[k]<UI.rank[k];setTimeout(()=>{rk.classList.remove('bump','down');void rk.offsetWidth;rk.classList.add(up?'bump':'down')},delayNow()*1000+900)}UI.rank[k]=r[k];
-    // mini-cartes des couleurs possédées
+    el.classList.toggle('cur',k===S.turn&&S.phase==='play');el.classList.toggle('out',!!P.out);el.classList.toggle('lead',r[k]===1&&!tie&&!P.out);
+    // l'anneau : la part de fortune par rapport au plus riche
+    const pct=P.out?0:Math.max(4,Math.round(worth(k)/top*100));el.querySelector('.fl').setAttribute('stroke-dasharray',`${pct} 100`);
+    el.querySelector('.rk').textContent=P.out?'faillite':tie?'':r[k]+(r[k]===1?'er':'e');
+    el.querySelector('.ow').innerHTML=P.out?'':`Fortune <b>${fmt(worth(k))} €</b>`;
     const cards=GSQ.map((g,gi)=>{const mine=g.filter(i=>S.own[i]&&S.own[i][0]===k);if(!mine.length)return '';const ho=mine.filter(i=>S.own[i][1]===5).length,h=mine.reduce((s,i)=>s+(S.own[i][1]<5?S.own[i][1]||0:0),0),full=mine.length===g.length;
-      return `<span class="gcd${full?' full':''}${darkG(gi)?' dk':''}" style="${gstG(gi)}" title="${mine.length}/${g.length}">${mine.length}/${g.length}${ho||h?`<em class="${ho?'ht':''}">${ho?ho+'H':h}</em>`:''}</span>`}).join('');
+      return `<span class="gcd${full?' full':''}${darkG(gi)?' dk':''}" style="${gstG(gi)}">${mine.length}/${g.length}${ho||h?`<em class="${ho?'ht':''}">${ho?ho+'H':h}</em>`:''}</span>`}).join('');
     const gr=GARES.filter(i=>S.own[i]&&S.own[i][0]===k).length,ut=UTILS.filter(i=>S.own[i]&&S.own[i][0]===k).length;
-    el.querySelector('.pg').innerHTML=(cards+(gr?`<span class="gcd gare" style="--gc:#2B3A67">${ico('train')}${gr}</span>`:'')+(ut?`<span class="gcd gare" style="--gc:#5B6B86">${ico('bolt')}${ut}</span>`:''))||'<span class="none">Aucune rue</span>';
-    const bd=[];if(P.inJail)bd.push('en prison');if(P.goj)bd.push('carte prison');if(P.out)bd.push('faillite');
-    if(mode==='online'&&P.peer&&groom&&!groom.peers().some(x=>x.peer===P.peer))bd.push('déconnecté');
+    const pg=(cards+(gr?`<span class="gcd gare" style="--gc:#2B3A67">${ico('train')}${gr}</span>`:'')+(ut?`<span class="gcd gare" style="--gc:#5B6B86">${ico('bolt')}${ut}</span>`:''))||'<span class="none">Aucune rue</span>';
+    const pgEl=el.querySelector('.pg');if(pgEl._h!==pg){pgEl.innerHTML=pg;pgEl._h=pg}
+    const off=present&&!P.bot&&P.peer&&!present.has(P.peer);
+    const bd=[];if(P.inJail)bd.push('en prison');if(P.goj)bd.push(P.goj>1?P.goj+' cartes prison':'carte prison');if(off)bd.push('absent');
     el.querySelector('.bdg').innerHTML=bd.map(t=>`<span>${t}</span>`).join('');
+    // un seul petit signe sur la pastille : prison, absent ou bot
+    const stt=P.out?'':P.inJail?ico('jail'):off?ico('xcircle'):P.bot?ico('robot'):'';const se=el.querySelector('.stt');if(se._h!==stt){se.innerHTML=stt;se._h=stt;se.hidden=!stt}
+    el.classList.toggle('off',!!off);
     const mv=el.querySelector('.mv');
     if(UI.disp[k]===undefined){UI.disp[k]=UI.tgt[k]=P.money;mv.textContent=fmt(P.money)}
     else if(UI.tgt[k]!==P.money){ch.push({k,d:P.money-UI.tgt[k],to:P.money});UI.tgt[k]=P.money}
@@ -3152,7 +3215,7 @@ function logIcon(l){return /remporte la partie/.test(l)?FI.win:/faillite/.test(l
   /achète/.test(l)?FI.buy:/construit|revend un bâtiment/.test(l)?FI.build:/hypoth/.test(l)?FI.mort:/échange|offre/.test(l)?FI.trade:/Départ|\+\d/.test(l)?FI.gain:/paie|loyer|travaux/.test(l)?FI.pay:FI.info}
 function renderFeed(){
   const sig=S.gid+':'+S.log.join('|');if(sig===UI.feedSig)return;const first=!UI.feedSig;UI.feedSig=sig;
-  const L=S.log.slice(-3);const go=()=>{if(UI.feedSig!==sig)return;document.getElementById('feed').innerHTML=L.map((l,j)=>`<div class="${j===L.length-1&&!first?'new':''}">${logIcon(l)}<span>${esc(l)}</span></div>`).join('')};
+  const l=S.log[S.log.length-1]||'';const go=()=>{if(UI.feedSig!==sig)return;const F=document.getElementById('feed');F.innerHTML=first?'':`<div class="new">${logIcon(l)}<span>${esc(l)}</span></div>`;clearTimeout(UI.feedH);UI.feedH=setTimeout(()=>{const d=F.firstElementChild;if(d)d.classList.add('bye')},3600)};
   first?go():setTimeout(go,delayNow()*1000+200);
 }
 
@@ -3205,8 +3268,8 @@ function renderDock(){
     const el=(performance.now()-UI.myDkT)/1000-delayNow();if(el>TURN_T-25)p=p.replace(/<\/div>$/,`<div class="timer afk"><i style="animation-duration:${TURN_T}s;animation-delay:-${el.toFixed(2)}s"></i></div><div class="st" style="text-align:center">Dépêche-toi : sinon on joue à ta place !</div></div>`)}
   const canManage=S.phase==='play'&&actor()>=0;
   const nProps=canManage?S.own.filter(w=>w&&w[0]===actor()).length:0;
-  const tools=S.phase==='play'?`<div class="tb"><button class="tool" data-ui="props" data-mine="1" ${canManage?'':'disabled'}>${TOOLI.props}<span class="lbl">Propriétés</span>${nProps?`<span class="c">${nProps}</span>`:''}</button>
-    <button class="tool" data-ui="trade" ${canManage&&!S.trade&&live(S).length>1?'':'disabled'}>${TOOLI.trade}<span class="lbl">Échanger</span></button><button class="tool" data-ui="log">${TOOLI.log}<span class="lbl">Journal</span></button>${(mode==='online'&&me>=0)||mode==='local'?`<button class="tool" data-react="t" aria-expanded="${!!UI.reactOpen}">${ico('smile')}<span class="lbl">Réagir</span></button>`:''}</div>${UI.reactOpen?`<div class="reacts">${REACTS.map((r,j)=>`<button data-react="${j}" aria-label="Réaction ${r}">${r}</button>`).join('')}</div>`:''}`:'';
+  const tools=S.phase==='play'?`<div class="tb"><button class="tool" data-ui="props" data-mine="1" ${canManage?'':'disabled'} aria-label="Mes propriétés" data-tip="Mes rues">${TOOLI.props}${nProps?`<span class="c">${nProps}</span>`:''}</button>
+    <button class="tool" data-ui="trade" ${canManage&&!S.trade&&live(S).length>1?'':'disabled'} aria-label="Échanger" data-tip="Échanger">${TOOLI.trade}</button><button class="tool" data-ui="log" aria-label="Journal" data-tip="Journal">${TOOLI.log}</button>${(mode==='online'&&me>=0)||mode==='local'?`<button class="tool" data-react="t" aria-expanded="${!!UI.reactOpen}" aria-label="Réagir" data-tip="Réagir">${ico('smile')}</button>`:''}</div>${UI.reactOpen?`<div class="reacts">${REACTS.map((r,j)=>`<button data-react="${j}" aria-label="Réaction ${r}">${r}</button>`).join('')}</div>`:''}`:'';
   const D=document.getElementById('dock'),html=p+tools,key=S.stage+':'+S.turn+':'+(performance.now()<(UI.busy||0))+':'+!!S.trade;
   if(D._h!==html){D.classList.toggle('noanim',D._k===key);const fresh=D._k!==key;D.innerHTML=html;D._h=html;D._k=key;if(fresh)setTimeout(focusPrimary,60)}
 }
@@ -3335,8 +3398,8 @@ function renderHUD(){
   if(UI.as!=null&&S.players[UI.as]?.out)UI.as=null;
   {const rk=S.gid+':'+S.roll;if(UI.rollKey!==rk){if(UI.rollKey!=null){diceResult();const d=delayNow();if(d>0){UI.busy=performance.now()+d*1000+250;clearTimeout(UI.bt);UI.bt=setTimeout(()=>{if(S)renderHUD()},d*1000+300)}}UI.rollKey=rk}}
   document.getElementById('roomchip').innerHTML=ico('users')+(mode==='local'?'Partie locale':`Salon ${code}${isHost?' · hôte':''}`);
-  {const o=S.opt||{},rc=document.getElementById('rndchip'),pc=document.getElementById('potchip');rc.innerHTML=ico('hourglass')+`Tour ${S.rnd||1}${o.turns?' / '+o.turns:''}`;rc.classList.toggle('hot',!!(o.turns&&(S.rnd||1)>=o.turns-2));
-   pc.hidden=!o.park;pc.innerHTML=`<span class="coin"></span> Cagnotte ${fmt(S.pot||0)} €`}
+  {const o=S.opt||{},rc=document.getElementById('rndchip'),pc=document.getElementById('potchip');rc.hidden=!o.turns;rc.innerHTML=ico('hourglass')+`${S.rnd||1}/${o.turns}`;rc.title=`Tour ${S.rnd||1} sur ${o.turns}`;rc.classList.toggle('hot',!!(o.turns&&(S.rnd||1)>=o.turns-2));
+   pc.hidden=!o.park||!(S.pot>0);pc.innerHTML=`<span class="coin"></span>${fmt(S.pot||0)}`;pc.title='Cagnotte du Parc gratuit'}
   // début de tour : bandeau, ou écran de passage du PC en local
   const tk=S.gid+':'+S.turn+':'+S.phase;
   if(S.phase==='play'&&tk!==UI.turnKey&&S.stage==='roll'){const first=UI.turnKey===null;UI.turnKey=tk;const T=S.players[S.turn],d=delayNow();
