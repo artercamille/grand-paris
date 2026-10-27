@@ -1073,12 +1073,20 @@ const SET=(()=>{const d={music:.55,sfx:.8,speed:'normal',cam:true};let v={};try{
 const saveSet=()=>{try{localStorage.setItem('lgp-set',JSON.stringify(SET))}catch(e){}};
 const SPD=()=>SET.speed==='fast'?1.8:1;
 
-/* ================= Audio : effets + musique, tout synthétisé ================= */
+/* ================= Audio : vrais échantillons (instruments, bruitages) + secours synthétisé ================= */
 let AC=null,BUS=null;
 function audioInit(){if(AC)return AC;try{AC=new(window.AudioContext||window.webkitAudioContext)();const m=AC.createGain();m.gain.value=.9;
-    const comp=AC.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=3;m.connect(comp);comp.connect(AC.destination);
-    BUS={master:m,sfx:AC.createGain(),music:AC.createGain()};BUS.sfx.connect(m);BUS.music.connect(m);applyVolumes()}catch(e){AC=null}return AC}
-function applyVolumes(){if(!BUS)return;const t=AC.currentTime;BUS.sfx.gain.setTargetAtTime(.55*SET.sfx*SET.sfx,t,.05);BUS.music.gain.setTargetAtTime(.42*SET.music*SET.music,t,.15)}
+    const comp=AC.createDynamicsCompressor();comp.threshold.value=-12;comp.ratio.value=3;comp.attack.value=.004;comp.release.value=.2;m.connect(comp);comp.connect(AC.destination);
+    // réverbération douce (salle), partagée
+    const rev=AC.createConvolver(),n=Math.floor(AC.sampleRate*2.2),ir=AC.createBuffer(2,n,AC.sampleRate);
+    for(let c=0;c<2;c++){const a=ir.getChannelData(c);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/n,3.2)*(i<AC.sampleRate*.012?i/(AC.sampleRate*.012):1)}
+    rev.buffer=ir;const rg=AC.createGain();rg.gain.value=.28;rev.connect(rg);rg.connect(m);
+    // bus musique : chaleur « vinyle » (passe-bas doux)
+    const mlp=AC.createBiquadFilter();mlp.type='lowpass';mlp.frequency.value=7200;mlp.Q.value=.5;mlp.connect(m);
+    BUS={master:m,sfx:AC.createGain(),music:AC.createGain(),rev,mlp};BUS.sfx.connect(m);BUS.music.connect(mlp);
+    const sr=AC.createGain();sr.gain.value=.35;BUS.sfx.connect(sr);sr.connect(rev);const mr=AC.createGain();mr.gain.value=.55;BUS.music.connect(mr);mr.connect(rev);
+    applyVolumes();BANK.load()}catch(e){AC=null}return AC}
+function applyVolumes(){if(!BUS)return;const t=AC.currentTime;BUS.sfx.gain.setTargetAtTime(.75*SET.sfx*SET.sfx,t,.05);BUS.music.gain.setTargetAtTime(.5*SET.music*SET.music,t,.15)}
 ['pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,()=>{audioInit();if(AC&&AC.state==='suspended')AC.resume().catch(()=>{});MUSIC.kick()},{passive:true}));
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 function tone(dest,f,t,d,{type='sine',vol=.3,f2=0,att=.006,rel=0}={}){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
@@ -1087,10 +1095,55 @@ let NOISE=null;const noiseBuf=()=>{if(NOISE)return NOISE;const n=AC.sampleRate*1
 function noise(dest,t,d,{vol=.3,freq=1800,q=1,type='bandpass'}={}){const s=AC.createBufferSource();s.buffer=noiseBuf();const f=AC.createBiquadFilter();f.type=type;f.frequency.value=freq;f.Q.value=q;
   const g=AC.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);s.connect(f);f.connect(g);g.connect(dest);s.start(t,Math.random()*.5);s.stop(t+d+.02)}
 
-const SFX=(()=>{const out=()=>BUS.sfx,T=(...a)=>tone(out(),...a),N=(...a)=>noise(out(),...a);
+/* ---------- banque d'échantillons (fichiers audio/ du site ; absente dans la version claude.ai) ---------- */
+const BANK=(()=>{const B={ready:false,buf:{},notes:{}};let started=false;
+  B.load=()=>{if(started||typeof SITE==='undefined'||!SITE||!AC)return;started=true;
+    fetch('audio/manifest.json').then(r=>r.json()).then(man=>{const jobs=[];
+      const get=(key,url)=>jobs.push(fetch(url).then(r=>r.arrayBuffer()).then(a=>new Promise((res,rej)=>AC.decodeAudioData(a,res,rej))).then(b=>{B.buf[key]=b}).catch(()=>{}));
+      man.fx.forEach(n=>get('fx/'+n,`audio/fx/${n}.mp3`));
+      Object.keys(man).filter(k=>k!=='fx').forEach(k=>{B.notes[k]=man[k];man[k].forEach(m=>get(k+'/'+m,`audio/${k}/${m}.mp3`))});
+      // les bruitages d'abord sont petits : prêts en premier ; la musique bascule quand tout est là
+      Promise.all(jobs).then(()=>{B.ready=true;MUSIC.restart()})}).catch(()=>{})};
+  B.has=k=>!!B.buf[k];
+  B.fx=(name,t,{vol=1,rate=1,dest,pan=0}={})=>{const b=B.buf['fx/'+name];if(!b)return false;const s=AC.createBufferSource();s.buffer=b;s.playbackRate.value=rate;const g=AC.createGain();g.gain.value=vol;
+    let n=g;if(pan&&AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=pan;g.connect(p);n=p}s.connect(g);n.connect(dest||BUS.sfx);s.start(t);return true};
+  B.note=(inst,m,t,dur,{vol=.5,dest,rel=.35,att=.004}={})=>{const L=B.notes[inst];if(!L||!L.length)return false;let best=L[0];for(const x of L)if(Math.abs(x-m)<Math.abs(best-m))best=x;
+    const b=B.buf[inst+'/'+best];if(!b)return false;const s=AC.createBufferSource();s.buffer=b;s.playbackRate.value=Math.pow(2,(m-best)/12);const g=AC.createGain();
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.setValueAtTime(vol,t+dur);g.gain.exponentialRampToValueAtTime(.0001,t+dur+rel);s.connect(g);g.connect(dest||BUS.sfx);s.start(t);s.stop(t+dur+rel+.05);return true};
+  return B})();
+
+const SFX=(()=>{const out=()=>BUS.sfx,T=(...a)=>tone(out(),...a),N=(...a)=>noise(out(),...a),F=(n,t,o)=>BANK.fx(n,t,o),Nt=(i,m,t,d,o)=>BANK.note(i,m,t,d,o);
+  const rnd=a=>a[Math.floor(Math.random()*a.length)];
+  // version échantillons : de vrais sons, mixés en couches
+  const R={
+    click:t=>F('ui_click',t,{vol:.5}),
+    hover:t=>F('ui_hover',t,{vol:.25}),
+    dicehit:(t,o)=>{const v=Math.min(1,(o&&o.v)||.6);F('dice'+(1+Math.floor(Math.random()*8)),t,{vol:.35+.6*v,rate:.92+Math.random()*.16,pan:(Math.random()-.5)*.5})},
+    dice:t=>F('felt'+(1+Math.floor(Math.random()*4)),t,{vol:.5}),
+    step:(t,o)=>{F('wood'+(1+Math.floor(Math.random()*6)),t,{vol:.3,rate:1.15+((o&&o.i)||0)%3*.06})},
+    land:t=>{F('tom',t,{vol:.35,rate:1.3});F('felt1',t,{vol:.35})},
+    coin:t=>{F('ui_coin',t,{vol:.5});Nt('xylo',91,t+.02,.15,{vol:.22});Nt('xylo',96,t+.1,.25,{vol:.2})},
+    pay:t=>{Nt('xylo',84,t,.12,{vol:.22});Nt('xylo',79,t+.09,.12,{vol:.2});Nt('xylo',72,t+.18,.3,{vol:.18})},
+    buy:t=>{F('till',t,{vol:.55});[60,64,67,72].forEach((m,k)=>Nt('piano',m+12,t+.18+k*.05,.6,{vol:.28}))},
+    build:t=>{F('rim',t,{vol:.6,rate:.8});F('rim',t+.16,{vol:.6,rate:.85});F('impact',t+.32,{vol:.3,rate:1.4});[72,76,79,84].forEach((m,k)=>Nt('xylo',m,t+.34+k*.06,.2,{vol:.18}))},
+    jail:t=>{F('door',t,{vol:.6});[[46,0],[45,.35],[44,.7],[43,1.05]].forEach(([m,d],k)=>Nt('tuba',m,t+.25+d,k===3?.9:.3,{vol:.45,rel:.25}))},
+    turn:t=>{F('bell',t,{vol:.25,rate:1.5});Nt('harmonium',72,t,.5,{vol:.12})},
+    card:t=>{F('swoosh',t,{vol:.5});F('ui_open',t+.15,{vol:.4});Nt('xylo',84,t+.3,.25,{vol:.15});Nt('xylo',91,t+.38,.35,{vol:.15})},
+    win:t=>{F('roll',t,{vol:.45});[[60,0,.18],[64,.2,.18],[67,.4,.18],[72,.6,1.2]].forEach(([m,d,l])=>Nt('trumpet',m,t+1.3+d,l,{vol:.45}));F('crash',t+1.9,{vol:.55});[48,52,55,60].forEach(m=>Nt('piano',m,t+1.9,1.4,{vol:.25}))},
+    tick:t=>F('rim',t,{vol:.3,rate:1.6}),
+    whoosh:t=>F('whoosh',t,{vol:.45}),
+    start:t=>{F('ui_levelup',t,{vol:.4});F('swoosh',t,{vol:.35})},
+    pop:t=>F('ui_select',t,{vol:.35}),
+    fanfare:t=>{[[67,0,.13],[67,.14,.13],[67,.28,.13],[72,.42,.7]].forEach(([m,d,l])=>Nt('trumpet',m,t+d,l,{vol:.42}));F('splash',t+.42,{vol:.4})},
+    crash:t=>{F('boom',t,{vol:.55});[[38,0],[37,.4],[36,.8]].forEach(([m,d])=>Nt('tuba',m,t+.2+d,.45,{vol:.5}))},
+    double:t=>{[[72,0],[76,.08],[79,.16],[84,.24]].forEach(([m,d])=>Nt('xylo',m,t+d,.2,{vol:.22}));F('ui_reward',t+.1,{vol:.35})}};
+  // secours synthétisé (version claude.ai, ou avant chargement)
   const P={
     click:t=>T(900,t,.06,{type:'triangle',vol:.1}),
-    dice:t=>{for(let k=0;k<8;k++){const u=t+k*.065+Math.random()*.03;N(u,.05,{vol:.4,freq:2200+Math.random()*1800,q:3});T(260+Math.random()*180,u,.04,{type:'square',vol:.035})}},
+    dice:t=>{for(let k=0;k<4;k++){const u=t+k*.05+Math.random()*.02;N(u,.04,{vol:.15,freq:2600+Math.random()*1500,q:3})}},
+    dicehit:(t,o)=>{const v=(o&&o.v)||.6;N(t,.05,{vol:.45*v,freq:2200+Math.random()*1800,q:3});T(240+Math.random()*160,t,.04,{type:'square',vol:.05*v})},
+    step:t=>N(t,.04,{vol:.12,freq:900,q:2}),
+    land:t=>T(150,t,.12,{vol:.18,f2:80}),
     coin:t=>{T(1318,t,.08,{type:'square',vol:.07});T(1976,t+.07,.32,{type:'square',vol:.07})},
     pay:t=>{T(700,t,.14,{type:'triangle',vol:.14,f2:420});T(520,t+.1,.18,{type:'triangle',vol:.1,f2:300})},
     buy:t=>{[523,659,784,1046].forEach((f,k)=>T(f,t+k*.07,.28,{type:'triangle',vol:.17}));N(t+.3,.14,{vol:.18,freq:6500,q:.7})},
@@ -1098,46 +1151,52 @@ const SFX=(()=>{const out=()=>BUS.sfx,T=(...a)=>tone(out(),...a),N=(...a)=>noise
     jail:t=>{T(392,t,.26,{type:'sawtooth',vol:.08,f2:196});T(311,t+.24,.45,{type:'sawtooth',vol:.08,f2:140});N(t+.55,.3,{vol:.35,freq:3200,q:9})},
     turn:t=>{[784,988,1175].forEach((f,k)=>T(f,t+k*.09,.4,{vol:.15}))},
     card:t=>{N(t,.3,{vol:.22,freq:1100,q:.5});T(523,t+.22,.3,{type:'triangle',vol:.12});T(784,t+.3,.45,{type:'triangle',vol:.12})},
-    win:t=>{[523,659,784,1046,784,1046,1318].forEach((f,k)=>T(f,t+k*.12,k===6?1:.22,{type:'square',vol:.08}));[0,.5,1].forEach(d=>N(t+.8+d,.5,{vol:.12,freq:7000,q:.4}))},
+    win:t=>{[523,659,784,1046,784,1046,1318].forEach((f,k)=>T(f,t+k*.12,k===6?1:.22,{type:'square',vol:.08}))},
     tick:t=>T(1600,t,.03,{type:'square',vol:.035}),
     whoosh:t=>N(t,.35,{vol:.18,freq:900,q:.6}),
-    start:t=>{[392,523,659,784].forEach((f,k)=>T(f,t+k*.06,.35,{type:'triangle',vol:.14}));N(t+.2,.4,{vol:.1,freq:5000,q:.5})},
+    start:t=>{[392,523,659,784].forEach((f,k)=>T(f,t+k*.06,.35,{type:'triangle',vol:.14}))},
     pop:t=>T(500,t,.09,{type:'sine',vol:.18,f2:900}),
-    fanfare:t=>{[[523,0],[659,.12],[784,.24],[1046,.36],[784,.6],[1046,.72]].forEach(([f,d])=>{T(f,t+d,.3,{type:'square',vol:.07});T(f/2,t+d,.3,{type:'triangle',vol:.1})});N(t+.36,.6,{vol:.14,freq:6000,q:.4})},
-    crash:t=>{T(300,t,.7,{type:'sawtooth',vol:.09,f2:60});N(t,.6,{vol:.4,freq:400,q:.8});T(80,t+.05,.5,{vol:.3,f2:40})}};
-  return{play(n,delay=0){if(!AC||!BUS||SET.sfx<=0||!P[n])return;if(AC.state==='suspended')AC.resume().catch(()=>{});try{P[n](AC.currentTime+Math.max(0,delay)+.01)}catch(e){}}};
+    fanfare:t=>{[[523,0],[659,.12],[784,.24],[1046,.36]].forEach(([f,d])=>T(f,t+d,.3,{type:'square',vol:.07}))},
+    crash:t=>{T(300,t,.7,{type:'sawtooth',vol:.09,f2:60});N(t,.6,{vol:.4,freq:400,q:.8})},
+    double:t=>{[1046,1318,1568].forEach((f,k)=>T(f,t+k*.07,.2,{type:'triangle',vol:.1}))}};
+  return{play(n,delay=0,o){if(!AC||!BUS||SET.sfx<=0)return;if(AC.state==='suspended')AC.resume().catch(()=>{});const t=AC.currentTime+Math.max(0,delay)+.01;
+    try{if(BANK.ready&&R[n]){R[n](t,o);return}if(P[n])P[n](t,o)}catch(e){}}};
 })();
 
 /* ---------- musique : séquenceur à anticipation ---------- */
 const MUSIC=(()=>{
-  // instruments (dest = bus du morceau, pour le fondu enchaîné)
-  const acc=(d,m,t,dur,vol)=>{const f=mtof(m),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2300;lp.Q.value=.6;const g=AC.createGain();
+  const S=()=>BANK.ready;
+  // instruments : vrais échantillons si dispo, sinon synthèse
+  const acc=(d,m,t,dur,vol)=>{if(S()&&BANK.note('harmonium',m,t,dur,{vol:vol*3.2,dest:d,rel:.12,att:.025}))return;
+    const f=mtof(m),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2300;lp.Q.value=.6;const g=AC.createGain();
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.03);g.gain.setValueAtTime(vol*.85,t+dur*.7);g.gain.exponentialRampToValueAtTime(.0001,t+dur+.12);
-    const lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=5.6;lg.gain.value=vol*.18;lfo.connect(lg);lg.connect(g.gain);
     [[-7,'sawtooth',.5],[7,'sawtooth',.5],[0,'square',.18]].forEach(([dt,ty,v])=>{const o=AC.createOscillator(),og=AC.createGain();o.type=ty;o.frequency.value=f;o.detune.value=dt;og.gain.value=v;o.connect(og);og.connect(lp);o.start(t);o.stop(t+dur+.2)});
-    lfo.start(t);lfo.stop(t+dur+.2);lp.connect(g);g.connect(d)};
-  const bass=(d,m,t,dur,vol)=>{tone(d,mtof(m),t,dur,{type:'triangle',vol,att:.01});tone(d,mtof(m+12),t,dur*.6,{type:'sine',vol:vol*.25,att:.01})};
-  const stab=(d,ms,t,dur,vol)=>{const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1500;lp.connect(d);ms.forEach(m=>tone(lp,mtof(m),t,dur,{type:'square',vol:vol/ms.length,att:.005}))};
-  const ep=(d,m,t,dur,vol)=>{const f=mtof(m);tone(d,f,t,dur,{type:'sine',vol,att:.004,rel:.25});tone(d,f*2,t,dur*.35,{type:'sine',vol:vol*.28,att:.002});tone(d,f*3.01,t,.12,{type:'sine',vol:vol*.08,att:.001})};
-  const hat=(d,t,vol)=>noise(d,t,.05,{vol,freq:8000,q:.8,type:'highpass'});
-  const kick=(d,t,vol)=>tone(d,110,t,.22,{vol,f2:45,att:.003});
-  const rim=(d,t,vol)=>noise(d,t,.07,{vol,freq:1800,q:4});
-  // valse musette pour les menus
+    lp.connect(g);g.connect(d)};
+  const bass=(d,m,t,dur,vol)=>{if(S()&&BANK.note('contrabass',m,t,dur,{vol:vol*2.6,dest:d,rel:.2}))return;tone(d,mtof(m),t,dur,{type:'triangle',vol,att:.01})};
+  const strum=(d,ms,t,dur,vol)=>{if(S()&&BANK.notes.guitar){ms.forEach((m,k)=>BANK.note('guitar',m,t+k*.018,dur,{vol:vol*2.2/ms.length*1.6,dest:d,rel:.15}));return}
+    const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1500;lp.connect(d);ms.forEach(m=>tone(lp,mtof(m),t,dur,{type:'square',vol:vol/ms.length,att:.005}))};
+  const ep=(d,m,t,dur,vol)=>{if(S()&&BANK.note('piano',m,t,dur,{vol:vol*3.4,dest:d,rel:.6}))return;const f=mtof(m);tone(d,f,t,dur,{type:'sine',vol,att:.004,rel:.25});tone(d,f*2,t,dur*.35,{type:'sine',vol:vol*.28,att:.002})};
+  const hat=(d,t,vol)=>{if(S()&&BANK.fx('hat',t,{vol:vol*7,dest:d,rate:1.1}))return;noise(d,t,.05,{vol,freq:8000,q:.8,type:'highpass'})};
+  const kick=(d,t,vol)=>{if(S()&&BANK.fx('kick',t,{vol:vol*4,dest:d}))return;tone(d,110,t,.22,{vol,f2:45,att:.003})};
+  const rim=(d,t,vol)=>{if(S()&&BANK.fx('snare',t,{vol:vol*5,dest:d,rate:1.05}))return;noise(d,t,.07,{vol,freq:1800,q:4})};
+  const brush=(d,t,vol)=>{if(S())BANK.fx('hatp',t,{vol,dest:d,rate:1.2})};
+  // valse musette (menus) : accordéon (harmonium), contrebasse, guitare manouche
   const W={bpm:150,beats:3,bars:16,
     ch:['C','C','G7','G7','G7','G7','C','C','C','C7','F','F','C','G7','C','C'],
     tones:{C:[60,64,67],G7:[59,62,65,67],C7:[60,64,67,70],F:[60,65,69]},root:{C:48,G7:43,C7:48,F:41},
     mel:[[[67,1],[72,1],[76,1]],[[74,2],[72,1]],[[71,1],[74,1],[79,1]],[[77,2],[74,1]],[[77,1],[76,1],[74,1]],[[71,1],[72,1],[74,1]],[[76,2],[72,1]],[[67,3]],
          [[67,1],[72,1],[76,1]],[[79,2],[76,1]],[[77,1],[81,1],[84,1]],[[81,2],[77,1]],[[79,1],[76,1],[72,1]],[[74,1],[77,1],[71,1]],[[72,1],[76,1],[79,1]],[[84,2],[0,1]]],
-    bar(d,b,loop,t,bt){const c=this.ch[b],r=this.root[c];bass(d,b%2?r+7-12:r,t,bt*.9,.2);
-      [1,2].forEach(k=>stab(d,this.tones[c].map(m=>m),t+k*bt,bt*.45,.11));
+    bar(d,b,loop,t,bt){const c=this.ch[b],r=this.root[c];bass(d,b%2?r+7-12:r,t,bt*.85,.2);
+      [1,2].forEach(k=>{strum(d,this.tones[c].map(m=>m-12),t+k*bt,bt*.5,.11);brush(d,t+k*bt,.22)});
       const oct=loop%2?-12:0,v=loop%2?.07:.085;let x=0;this.mel[b].forEach(([m,l])=>{if(m)acc(d,m+oct,t+x*bt,l*bt*.92,v);x+=l});
       if(loop%2&&b%4===3)acc(d,this.tones[c][2]+12,t+2*bt,bt*.8,.04)}};
-  // lo-fi douce pour la partie
+  // lo-fi douce (partie) : piano, contrebasse, batterie feutrée, craquement de vinyle
   const L={bpm:80,beats:4,bars:16,
     prog:[['F',41,[53,57,60,64]],['E',40,[52,55,59,62]],['D',38,[50,53,57,60]],['C',36,[48,52,55,59]],['F',41,[53,57,60,64]],['E',40,[52,55,59,62]],['D',38,[50,53,57,60]],['G',43,[50,53,55,59]]],
     pent:[72,74,76,79,81,84],last:76,seed:7,
     rnd(){this.seed=this.seed*16807%2147483647;return this.seed/2147483647},
     bar(d,b,loop,t,bt){const [,r,v]=this.prog[b%8],sw=bt*.09;
+      if(S()&&b%2===0)BANK.fx('hiss',t,{vol:.18,dest:d});
       bass(d,r,t,bt*1.8,.2);bass(d,r+(b%2?7:0),t+2*bt,bt*1.4,.15);
       [[0,1.6,.055],[1.5,.9,.04],[3,.8,.03]].forEach(([p,l,vo])=>v.forEach((m,k)=>ep(d,m+(k===0?12:0),t+p*bt+k*.012,l*bt,vo)));
       kick(d,t,.16);kick(d,t+2.5*bt,.1);rim(d,t+bt,.06);rim(d,t+3*bt,.06);
@@ -1152,7 +1211,10 @@ const MUSIC=(()=>{
   const start=()=>{if(!AC||AC.state!=='running'||cur===want)return;stopBus(bus);bus=null;cur=want;if(!cur)return;
     bus=AC.createGain();bus.gain.value=0;bus.connect(BUS.music);bus.gain.linearRampToValueAtTime(1,AC.currentTime+1.5);next=AC.currentTime+.15;bar=0;loop=0;
     if(!timer)timer=setInterval(tick,80);tick()};
-  return{want(n,delay=0){clearTimeout(this.h);if(delay){this.h=setTimeout(()=>this.want(n),delay*1000);return}want=n||null;start()},kick(){if(AC&&AC.state==='suspended')AC.resume().then(start).catch(()=>{});else start()}};
+  return{want(n,delay=0){clearTimeout(this.h);if(delay){this.h=setTimeout(()=>this.want(n),delay*1000);return}want=n||null;start()},
+    kick(){if(AC&&AC.state==='suspended')AC.resume().then(start).catch(()=>{});else start()},
+    // échantillons arrivés : on relance le morceau en cours (fondu) pour passer aux vrais instruments
+    restart(){if(!AC||!cur)return;const w=cur;cur=null;want=w;start()}};
 })();
 
 /* ================= Accueil / salon ================= */
@@ -2323,6 +2385,12 @@ function buildBoard(){
       if(nt.distanceTo(C.base.t)<.02&&Math.abs(nd-C.base.d)<.03){C.mode='idle';C.base=null}}};
   controls.addEventListener('start',()=>{G.cam.mode='user';G.cam.base=null;G.shot=null});
   initFX();
+  // fluidité : on compile d'avance tous les shaders des effets (maisons, hôtels, pions, cartes, billets, poussière, éclairs)
+  try{const tmp=new THREE.Group();tmp.position.y=-30;scene.add(tmp);const pw=makePawn(0xE31B23,0);pw.position.y=-30;
+    [G.P(0x1FB25A,{roughness:.3,clearcoat:.8}),G.P(0xE31B23,{roughness:.3,clearcoat:.8})].forEach(m=>G.mesh(new THREE.BoxGeometry(.1,.1,.1),m,0,0,0,tmp));
+    G.fx.warm().forEach(o=>tmp.add(o));renderer.compile(scene,camera);
+    // une image hors champ pour envoyer les textures au GPU
+    scene.remove(tmp);G.scene.remove(pw);G.fx.dust(new THREE.Vector3(0,-30,0),.1)}catch(e){console.warn('warm',e)}
   G.photo=false;
   const setPhoto=on=>{G.photo=on;document.body.classList.toggle('photo',on);Object.assign(controls,on?{enablePan:true,minDistance:1.6,maxDistance:40,maxPolarAngle:1.47}:{enablePan:false,minDistance:6.5,maxDistance:G.maxD||26,maxPolarAngle:1.4});G.shot=null;layout()};
   document.getElementById('photo').addEventListener('click',()=>setPhoto(true));document.getElementById('photoOff').addEventListener('click',()=>setPhoto(false));
@@ -2343,10 +2411,12 @@ function buildBoard(){
     if(att){G.pawns.forEach(p=>p.obj.visible=false);G.attA=(G.attA??Math.atan2(camera.position.x,camera.position.z))+dt*.06;const a=G.attA,r=15.5,tp=new THREE.Vector3(Math.sin(a)*r,6.2+Math.sin(a*.7)*1.2,Math.cos(a)*r);
       camera.position.lerp(tp,Math.min(1,dt*1.2));controls.target.lerp(new THREE.Vector3(0,.4,0),Math.min(1,dt*1.2));camera.lookAt(controls.target);G.intro=null;G.shot=null}
     else{G.attA=null;if(!SET.cam&&!G.intro)G.shot=null}
-    if(!att)G.pawns.forEach(p=>{if(p.wait>0){p.wait-=dt*SPD()}else if(p.path){p.u+=dt*SPD()/p.dur;while(p.u>=1&&p.path){p.u-=1;p.from=p.path.shift();if(!p.path.length){p.path=null;p.obj.position.copy(p.from);G.cam.idle=0;G.fx.dust(p.from.clone(),1)}}
+    if(!att)G.pawns.forEach(p=>{if(p.wait>0){p.wait-=dt*SPD();p.si=0}else if(p.path){p.u+=dt*SPD()/p.dur;while(p.u>=1&&p.path){p.u-=1;p.from=p.path.shift();p.si=(p.si||0)+1;
+          if(!p.path.length){p.path=null;p.obj.position.copy(p.from);G.cam.idle=0;G.fx.dust(p.from.clone(),1);p.land=0;SFX.play('land')}else if(!p.direct)SFX.play('step',0,{i:p.si})}
         if(p.path){const to=p.path[0],u=p.u;p.obj.position.lerpVectors(p.from,to,u);p.obj.position.y=BY+Math.sin(Math.PI*u)*(p.direct?.7:.28);
           const dx=to.x-p.from.x,dz=to.z-p.from.z;if(!p.direct&&Math.abs(dx)+Math.abs(dz)>.01)p.obj.rotation.y=Math.atan2(dx,dz);moving=p}}
-      else if(p.target)p.obj.position.lerp(p.target,.16)});
+      else if(p.target)p.obj.position.lerp(p.target,.16);
+      G.pawnLife(p,dt)});
     if(!att)G.pawns.forEach((p,k)=>{const P=S.players[k],act=P&&k===S.turn&&S.phase==='play',b=p.obj.userData.base;if(b)b.emissiveIntensity=act?.35+.25*Math.sin(now/300):0;
       if(act&&!p.path&&!(p.wait>0)&&p.target)p.obj.position.y=p.target.y+.05+Math.sin(now/400)*.035;if(p.obj.userData.idle&&!p.path)p.obj.userData.idle(now/1000+k*1.7)});
     {const ws=G.wantShift||0,cs=G.shiftX||0;if(Math.abs(cs-ws)>.5){G.shiftX=Math.abs(ws-cs)<1?ws:cs+(ws-cs)*Math.min(1,dt*7);G.applyView()}}
@@ -2386,7 +2456,19 @@ function buildBoard(){
 }
 
 /* ---------- effets : dés 3D, cartes, billets, poussière, constructions ---------- */
-function initFX(){const S3=G.scene,cam=G.camera,fx={};G.fx=fx;
+/* ---------- pions vivants : écrasement-étirement, réactions ---------- */
+const sm01=q=>{q=Math.max(0,Math.min(1,q));return q*q*(3-2*q)};
+function pawnLife(p,dt){const R=p.obj.userData.rx;if(!R)return;let sy=1,yo=0,ax=0,ay=0,az=0;
+  if(p.path&&!p.direct&&!(p.wait>0)){const u=p.u;sy=u<.15?1-.2*(1-u/.15):u>.85?1-.2*((u-.85)/.15):1+.13*Math.sin(Math.PI*(u-.15)/.7)}
+  else if(p.land!=null){p.land+=dt;const t=p.land;sy=1-.3*Math.exp(-6.5*t)*Math.cos(16*t);if(t>1.1)p.land=null}
+  const rc=p.react;if(rc){rc.t+=dt;const t=rc.t;
+    if(t>=0){if(rc.type==='happy'){if(t<.12)sy*=1-.25*sm01(t/.12);else if(t<.72){const f=(t-.12)/.6;yo=.38*Math.sin(Math.PI*f);sy*=1+.12*Math.sin(Math.PI*f);ay=Math.PI*2*sm01(f)}else{const l=t-.72;sy*=1-.25*Math.exp(-7*l)*Math.cos(17*l)}if(t>1.3)p.react=null}
+      else if(rc.type==='cheer'){const ph=t/.46,k=Math.floor(ph),f=ph%1;if(k<3){const h=.34*(1-k*.22);yo=h*Math.sin(Math.PI*f);sy*=f<.1?1-.22*(1-f/.1):1+.14*Math.sin(Math.PI*f);az=(k%2?1:-1)*.18*Math.sin(Math.PI*f)}else{const l=t-1.38;sy*=1-.22*Math.exp(-7*l)*Math.cos(17*l)}if(t>1.9)p.react=null}
+      else if(rc.type==='sad'){const e=t<.35?sm01(t/.35):t>1.7?sm01((2.2-t)/.5):1;ax=.42*e;sy*=1-.16*e;ay=.22*Math.sin(t*4.5)*e*(t>.5?1:0);if(t>2.2)p.react=null}
+      else if(rc.type==='shake'){const k=Math.max(0,1-t/1.3);az=.32*Math.sin(t*36)*k;sy*=1-.1*Math.abs(Math.sin(t*36))*k;if(t>1.3)p.react=null}}}
+  const sx=1/Math.sqrt(sy);R.scale.set(sx,sy,sx);R.position.y=yo;R.rotation.set(ax,ay,az)}
+function initFX(){const S3=G.scene,cam=G.camera,fx={};G.fx=fx;G.pawnLife=pawnLife;
+  G.react=(k,type,delay=0)=>{const p=G.pawns[k];if(p&&p.obj.visible)p.react={type,t:-delay}};
   const ctex=c=>{const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;return t};
   const cnv=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return[c,c.getContext('2d')]};
   // dés
@@ -2420,6 +2502,9 @@ function initFX(){const S3=G.scene,cam=G.camera,fx={};G.fx=fx;
     m.position.set(F.C.x,BY+.012,F.C.z);m.scale.set((R.x1-R.x0)/TEX*10,1,(R.y1-R.y0)/TEX*10);S3.add(m);flashes.push({m,t:-delay})};
   // constructions qui tombent
   const drops=[];const bounce=t=>{const n=7.5625,d=2.75;if(t<1/d)return n*t*t;if(t<2/d)return n*(t-=1.5/d)*t+.75;if(t<2.5/d)return n*(t-=2.25/d)*t+.9375;return n*(t-=2.625/d)*t+.984375};
+  fx.warm=()=>{const cv=cnv(8,8)[0],cm=()=>new THREE.MeshBasicMaterial({map:ctex(cv),toneMapped:false,transparent:true});
+    return[new THREE.Mesh(noteGeo,noteMat),new THREE.Mesh(new THREE.PlaneGeometry(1,1),cm()),new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false})),
+      new THREE.Sprite(new THREE.SpriteMaterial({map:dustTex,transparent:true,depthWrite:false,color:0xEDE6D8,opacity:0}))]};
   const pops=[];fx.pop=(o,delay=0)=>{o.scale.setScalar(.001);pops.push({o,t:-delay})};
   fx.drop=(objs,delay=0)=>objs.forEach(o=>{const y0=o.position.y;o.position.y=y0+2.4;drops.push({o,y0,t:-delay})});
   // cartes 3D
@@ -2445,9 +2530,14 @@ function initFX(){const S3=G.scene,cam=G.camera,fx={};G.fx=fx;
     x.fillStyle=P.c;x.fillRect(150,780,300,10);return c};
   const qDown=new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI/2,0,0));
   const ease=t=>1-Math.pow(1-t,3);
+  // chute puis rebonds amortis qui touchent vraiment la table (un « toc » à chaque contact)
+  const BNC=[[0,.3,2.8],[.3,.55,.5],[.55,.73,.19],[.73,.85,.07],[.85,.93,.025]];
+  const bounceH=u=>{for(let k=0;k<BNC.length;k++){const[a,b,h]=BNC[k];if(u<b){const q=(u-a)/(b-a);return[k,k?h*4*q*(1-q):h*(1-q*q)]}}return[BNC.length,0]};
+  fx.diceC=()=>rest(0).add(rest(1)).multiplyScalar(.5);
   fx.update=(t,dt)=>{
     dice.forEach(d=>{const A=d.a;if(!A)return;A.t+=dt/A.dur;const u=Math.min(1,A.t),e=ease(u);
-      d.m.position.lerpVectors(A.from,A.to,e);d.m.position.y=A.to.y+2.8*Math.pow(1-u,3)+Math.abs(Math.sin(u*Math.PI*3))*.45*Math.pow(1-u,2);
+      d.m.position.lerpVectors(A.from,A.to,e);const[sg,hh]=bounceH(u);d.m.position.y=A.to.y+hh;
+      if(A.seg!=null&&sg>A.seg)SFX.play('dicehit',0,{v:[1,.62,.38,.2,.1,.06][A.seg]});A.seg=sg;
       d.m.quaternion.copy(A.qf).multiply(new THREE.Quaternion().setFromAxisAngle(A.ax,A.sp*(1-e)));if(u>=1){d.a=null;fx.dust(d.m.position.clone().setY(.01),.45)}});
     for(let k=puffs.length-1;k>=0;k--){const p=puffs[k];if(p.t<0){p.t+=dt;continue}p.t+=dt/.75;if(p.t>=1){S3.remove(p.sp);p.sp.material.dispose();puffs.splice(k,1);continue}
       p.sp.position.x+=p.vx*dt*(1-p.t);p.sp.position.z+=p.vz*dt*(1-p.t);p.sp.position.y+=.12*dt;p.sp.scale.setScalar((.1+.35*p.t)*p.s);p.sp.material.opacity=.7*(1-p.t)}
@@ -2474,7 +2564,7 @@ function applyQuality(){if(!G||G.fail)return;const hi=QUAL==='max';if(G.mirror){
 function tileFrame(i){const R=rectOf(i),C=new THREE.Vector3(W2((R.x0+R.x1)/2),BY,W2((R.y0+R.y1)/2)),sd=side(i);
   if(sd==='corner')return{C,A:[1,0],I:[0,0],w:1.3,d:1.3};const a=ROT[sd],ex=(R.x1-R.x0)/TEX*10,ey=(R.y1-R.y0)/TEX*10,v=sd==='l'||sd==='r';return{C,A:rotv(1,0,a),I:rotv(0,-1,a),w:v?ey:ex,d:v?ex:ey}}
 const TOKENS=['béret','croissant','pigeon','trottinette','macaron','baguette'];
-function makePawn(color,k){const g=new THREE.Group(),fig=new THREE.Group();g.add(fig);
+function makePawn(color,k){const g=new THREE.Group(),rx=new THREE.Group(),fig=new THREE.Group();g.add(rx);rx.add(fig);g.userData.rx=rx;
   const gold=new THREE.MeshStandardMaterial({color:0xD9B24C,metalness:1,roughness:.26,envMap:G.env,envMapIntensity:1.35}),dark=new THREE.MeshStandardMaterial({color:0x2A2118,metalness:.5,roughness:.35,envMap:G.env}),
     base=new THREE.MeshPhysicalMaterial({color,emissive:color,emissiveIntensity:0,roughness:.25,metalness:.1,clearcoat:1,clearcoatRoughness:.08,envMap:G.env,envMapIntensity:.8});g.userData.base=base;
   const add=(geo,mat,x,y,z,rx=0,ry=0,rz=0,sx=1,sy=1,sz=1,par=fig)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.set(rx,ry,rz);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;par.add(m);return m};
@@ -2545,6 +2635,8 @@ const pawnPos=k=>((G.pawns[k]&&(G.pawns[k].target||G.pawns[k].obj.position))||ne
 function renderBoard(){
   let rolled=false;
   if(G&&!G.fail&&G.fx){if(G.lastRoll===undefined||G.lastGidR!==S.gid)G.fx.placeDice(S.dice[0],S.dice[1]);else if(S.roll!==G.lastRoll){const dbl=S.dice[0]===S.dice[1];G.fx.rollDice(S.dice[0],S.dice[1],dbl);rolled=dbl?2.3:1.2;
+      if(SET.cam&&!G.intro&&!G.photo&&G.cam.mode!=='user'){G.shot={t:0,dur:rolled+.45,c:G.fx.diceC().setY(.25),d:4.4,el:.95,ys:.1}}
+      if(dbl&&G.react)G.react(S.turn,'cheer',rolled-.2);
     }G.lastRoll=S.roll;G.lastGidR=S.gid}
   if(G&&!G.fail){
     const os=S.own.map(w=>w?w[0]+'.'+w[2]:'-').join(',');if(os!==G.ownSig){G.ownSig=os;drawBoardTex();Object.entries(G.bands).forEach(([i,b])=>{const w=S.own[i];b.material=w&&w[2]?G.bandGray:G.bandMats[SQ[i].g]})}
@@ -2571,16 +2663,17 @@ function renderBoard(){
       const t=new THREE.Vector3(x,BY,z);if(!pw.target){pw.obj.position.copy(t);pw.pos=P.pos}
       else if(pw.pos!==P.pos){const direct=P.inJail&&P.pos===10;let st=(P.pos-pw.pos+40)%40,dir=1;if(st>=37){dir=-1;st=40-st}
         pw.from=pw.obj.position.clone();pw.direct=direct;pw.u=0;
-        pw.path=direct?[t]:[...Array(st-1)].map((_,j)=>pathPoint((pw.pos+dir*(j+1)+40)%40)).concat([t]);pw.dur=direct?1:Math.max(.09,Math.min(.22,2.6/st));pw.pos=P.pos;pw.wait=rolled||0;if(direct){G.shot={t:-(pw.wait||0),dur:2.6,c:pw.from.clone().setY(BY),d:6.5,el:.42,ys:.35,follow:pw};banner('EN PRISON !',pw.wait||0)}
+        pw.path=direct?[t]:[...Array(st-1)].map((_,j)=>pathPoint((pw.pos+dir*(j+1)+40)%40)).concat([t]);pw.dur=direct?1:Math.max(.09,Math.min(.22,2.6/st));pw.pos=P.pos;pw.wait=rolled||0;if(direct){G.shot={t:-(pw.wait||0),dur:2.6,c:pw.from.clone().setY(BY),d:6.5,el:.42,ys:.35,follow:pw};banner('EN PRISON !',pw.wait||0);pw.react={type:'shake',t:-((pw.wait||0)+1.15)}}
         if(G.cam.mode==='user')G.cam.mode='idle';G.cam.idle=0}
       else if(pw.path)pw.path[pw.path.length-1]=t;
       pw.target=t});
     if(G.fx){const del=pawnDelay(),mon=S.players.map(P=>P.money);
+      const bought=G.prevOwn&&G.prevOwnG===S.gid&&S.own.some((w,i)=>w&&G.prevOwn[i]===null);
       if(G.prevMon&&G.prevMonG===S.gid){const d=mon.map((m,k)=>m-G.prevMon[k]),pay=[],rec=[];d.forEach((v,k)=>{if(v<0)pay.push([v,k]);else if(v>0)rec.push([v,k])});
-        pay.forEach(([v,k])=>{const j=rec.findIndex(([r])=>r===-v);if(j>=0){const r=rec.splice(j,1)[0];G.fx.money(pawnPos(k),pawnPos(r[1]),-v,del)}else G.fx.money(pawnPos(k),G.fx.BANK,-v,del)});
-        rec.forEach(([v,k])=>G.fx.money(G.fx.BANK,pawnPos(k),v,del))}
+        pay.forEach(([v,k])=>{const j=rec.findIndex(([r])=>r===-v);if(j>=0){const r=rec.splice(j,1)[0];G.fx.money(pawnPos(k),pawnPos(r[1]),-v,del);G.react(k,'sad',del+.1);G.react(r[1],'happy',del+.7)}else{G.fx.money(pawnPos(k),G.fx.BANK,-v,del);if(-v>=100&&!bought)G.react(k,'sad',del+.1)}});
+        rec.forEach(([v,k])=>{G.fx.money(G.fx.BANK,pawnPos(k),v,del);if(v>=100)G.react(k,'happy',del+.5)})}
       G.prevMon=mon;G.prevMonG=S.gid;
-      if(G.prevOwn&&G.prevOwnG===S.gid)S.own.forEach((w,i)=>{if(w&&G.prevOwn[i]===null){const F=tileFrame(i);G.fx.flash(i,S.players[w[0]].c,del);if(!G.shot)G.shot={t:-del,dur:3,c:F.C.clone(),d:4.3,el:.6,ys:.16};}});
+      if(G.prevOwn&&G.prevOwnG===S.gid)S.own.forEach((w,i)=>{if(w&&G.prevOwn[i]===null){const F=tileFrame(i);G.fx.flash(i,S.players[w[0]].c,del);G.react(w[0],'happy',del+.15);if(!G.shot)G.shot={t:-del,dur:3,c:F.C.clone(),d:4.3,el:.6,ys:.16};}});
       G.prevOwn=S.own.map(w=>w?w[0]:null);G.prevOwnG=S.gid;
       const ck=S.card?S.roll+':'+S.card.d+':'+S.card.k:null;
       if(G.lastCK!==undefined&&ck&&ck!==G.lastCK){G.fx.showCard(G.fx.cardFront(S.card.d,CARDS[S.card.d][S.card.k][0]),G.fx.cardBack(S.card.d),new THREE.Vector3(-6.55,.25,S.card.d==='ch'?-1.1:1.1),del);
@@ -2718,7 +2811,7 @@ function diceResult(){if(!S||!S.dice)return;const [a,b]=S.dice,dbl=a===b,L=S.log
   el.className='dres'+(dbl?' dbl':'');
   el.innerHTML=`<div class="dr">${k>=0?pav(k,'s'):''}<div class="dd">${dface(a)}<b class="op">+</b>${dface(b)}<b class="op">=</b><b class="sum">${a+b}</b></div></div>${tag?`<div class="dtag ${cls}">${tag}</div>`:`<div class="dtag">${P?esc(P.n)+' avance de '+(a+b)+' cases':''}</div>`}`;
   const land=(dbl?2.05:1.05);clearTimeout(diceResult.h);clearTimeout(diceResult.h2);el.hidden=true;
-  diceResult.h=setTimeout(()=>{el.hidden=false;el.classList.remove('go');void el.offsetWidth;el.classList.add('go');SFX.play(dbl?'fanfare':'pop')},land*1000);
+  diceResult.h=setTimeout(()=>{el.hidden=false;el.classList.remove('go');void el.offsetWidth;el.classList.add('go');SFX.play(dbl?'double':'pop')},land*1000);
   diceResult.h2=setTimeout(()=>{el.hidden=true},(land+(tag?3.2:2.4))*1000)}
 /* ---------- réactions rapides ---------- */
 const REACTS=['😂','😡','👏','💸','😱','🔥'];
@@ -2870,7 +2963,7 @@ function renderDock(){
   const av=k=>pav(k,'m');
   let p='';
   if(S.phase==='over'){p=''}
-  else if(performance.now()<(UI.busy||0)){p=`<div class="prompt wait one"><div class="hd">${av(cur)}<div><div class="tt">${esc(T.n)} avance de ${S.dice[0]+S.dice[1]} cases</div><div class="st">${S.dice[0]===S.dice[1]?'Double ! Il rejouera ensuite.':'Suis son pion sur le plateau.'}</div></div></div></div>`}
+  else if(performance.now()<(UI.busy||0)){p=''}
   else{
     const debt=S.players.map((P,k)=>k).filter(k=>!S.players[k].out&&S.players[k].money<0&&(local||k===me));
     if(debt.length){const k=debt[0],P=S.players[k];
@@ -3020,7 +3113,7 @@ function events(){
   snap.own.forEach((o,i)=>{if(o&&!pv.own[i])flyDeed(i,+o.split(':')[0])});
   if(bought)SFX.play('buy',d+.2);if(built)SFX.play('build');
   if(snap.jail.some((j,k)=>j&&!pv.jail[k]))SFX.play('jail',d+.1);
-  if(snap.phase==='over'&&pv.phase!=='over')SFX.play('win',.3);
+  if(snap.phase==='over'&&pv.phase!=='over'){SFX.play('win',.3);if(G&&G.react){const w=S.players.map((P,k)=>[P.out?-1e9:P.money,k]).sort((a,b)=>b[0]-a[0])[0][1];G.react(w,'cheer',1.4);setTimeout(()=>G.react&&G.react(w,'cheer',0),3400)}}
   try{if(pv.out)moments(pv,snap,d)}catch(e){}
 }
 function renderHUD(){

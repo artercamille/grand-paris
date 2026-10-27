@@ -16,3 +16,14 @@ Jeu de propriétés en 3D sur un plateau aux rues de Paris, à jouer entre potes
 1. https://discord.com/developers/applications → **New Application** → nomme-la « Le Grand Paris ».
 2. Onglet **OAuth2** → **Redirects** → ajoute exactement `https://artercamille.github.io/grand-paris/` → **Save**.
 3. Copie l'**Application ID** (onglet General Information) dans `config.js`.
+
+## Sons et musique (`audio/`)
+
+Musique jouée en direct par le jeu (séquenceur Web Audio) à partir d'échantillons d'instruments ; bruitages mixés en couches.
+
+- Instruments (piano, harmonium, contrebasse, guitare, trompette, tuba, xylophone) : [tonejs-instruments](https://github.com/nbrosowsky/tonejs-instruments) par Nicholaus Brosowsky, licence **CC-BY 3.0**.
+- Batterie, caisse enregistreuse, cloche, porte, souffles, vinyle : échantillons de [Sonic Pi](https://github.com/sonic-pi-net/sonic-pi) (Freesound, **CC0**).
+- Chocs de dés (plastique, feutre, bois) : [dice-box](https://github.com/3d-dice/dice-box), licence **MIT**.
+- Sons d'interface : [uisfx](https://www.npmjs.com/package/uisfx), **CC0**.
+
+Les fichiers sont réencodés en MP3 mono 64 kb/s par `snd/mkaudio.py` (non publié).
