@@ -2271,6 +2271,9 @@ function buildBoard(){
     if(distRiver(X,Z)<.64||busy(X,Z)||distAv(X,Z)<.06)continue;(rnd()<.13?parks:blocks).push([X,Z])}
   // îlots coupés par une avenue : ils deviennent de petits squares plantés
   const HW=.2275,squares=[];{const ok=[];blocks.forEach(([X,Z])=>{const pts=[[-HW,-HW],[HW,-HW],[HW,HW],[-HW,HW],[0,-HW],[HW,0],[0,HW],[-HW,0]];(pts.some(([a,b])=>distAv(X+a,Z+b)<.075)?squares:ok).push([X,Z])});blocks.splice(0,blocks.length,...ok)}
+  // un îlot coupé par une avenue garde les immeubles qui ne la touchent pas (îlot en biseau) ; s'il en reste trop peu, c'est un square
+  const CUTB=[];{const keep=[];squares.forEach(([X,Z])=>{let n=0,t=0;for(let k=0;k<24;k++){const a=k/24*Math.PI*2,r=HW-.065,px=X+Math.max(-1,Math.min(1,Math.cos(a)*1.5))*r,pz=Z+Math.max(-1,Math.min(1,Math.sin(a)*1.5))*r;t++;if(distAv(px,pz)>.12)n++}
+    (n/t>=.45?CUTB:keep).push([X,Z])});squares.splice(0,squares.length,...keep)}
   // certains îlots voisins sont réunis en un seul long îlot (la rue entre eux disparaît)
   const BR=[];{const key=(X,Z)=>Math.round(X/.55)+','+Math.round(Z/.55),has=new Set(blocks.map(b=>key(...b))),used=new Set();
     blocks.forEach(([X,Z])=>{const k=key(X,Z);if(used.has(k))return;used.add(k);
@@ -2384,7 +2387,7 @@ function buildBoard(){
   const fol=[],trunks=[],ao=[],cars=[];
   const ico=new THREE.IcosahedronGeometry(1,1),trk=new THREE.CylinderGeometry(.7,1,1,5),aoPl=new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2);
   const tree=(x,z,s=1)=>{trunks.push(bake(trk,x,CY+.05*s,z,0,.018*s,.1*s,.018*s));
-    const tc=new THREE.Color().setHSL(.24+rnd()*.08,.55+rnd()*.15,.22+rnd()*.1);fol.push(bake(ico,x,CY+.15*s,z,rnd()*3,.08*s,.085*s,.08*s,tc));
+    s*=.85+rnd()*.3;const tc=new THREE.Color().setHSL(.25+rnd()*.06,.36+rnd()*.14,.2+rnd()*.08);fol.push(bake(ico,x,CY+.15*s,z,rnd()*3,.08*s,.085*s,.08*s,tc));
     fol.push(bake(ico,x+.035*s,CY+.19*s,z-.02*s,rnd()*3,.055*s,.06*s,.055*s,tc.clone().offsetHSL(0,0,.05)));fol.push(bake(ico,x-.03*s,CY+.18*s,z+.03*s,rnd()*3,.05*s,.055*s,.05*s,tc.clone().offsetHSL(0,0,.03)));ao.push(bake(aoPl,x,CY+.002,z,0,.26*s,1,.26*s))};
   parks.forEach(([X,Z])=>{tree(X-.12,Z-.12,1.1);tree(X+.12,Z-.1,.95);tree(X-.1,Z+.13,1);tree(X+.13,Z+.12,.9)});
   for(let t=.01;t<.995;t+=.018)for(const sgn of[-1,1]){const p=curve.getPoint(t),d=curve.getTangent(t),l=Math.hypot(d.x,d.z),x=p.x+(-d.z/l)*.53*sgn,z=p.z+(d.x/l)*.53*sgn;
@@ -2428,7 +2431,11 @@ function buildBoard(){
       x.fillStyle='#3B4A5E';x.fillRect(X,Y,28,hh);x.fillStyle='rgba(190,220,240,.5)';x.fillRect(X+2,Y+2,10,hh*.45);x.fillStyle='rgba(255,250,240,.75)';x.fillRect(X+13,Y,2,hh);x.fillRect(X,Y+hh*.5,28,2)}
     // balcons filants en fer forgé (2e et 5e étages)
     for(const r of[0,3]){const Y=14+r*44+(r===0?36:32);x.fillStyle='#22262C';x.fillRect(2,Y,w-4,3);x.fillStyle='rgba(34,38,44,.85)';for(let i=4;i<w-4;i+=4)x.fillRect(i,Y-8,1.5,8);x.fillRect(2,Y-9,w-4,1.5)}
-    x.fillStyle='rgba(255,255,255,.3)';x.fillRect(0,0,w,4)});
+    // patine : coulures sous les appuis, salissure au pied du mur, ombre sous la corniche
+    for(let k=0;k<4;k++)for(let r=0;r<4;r++){const X=18+k*64,Y=14+r*44+(r===0?34:30)+3;const g=x.createLinearGradient(0,Y,0,Y+14);g.addColorStop(0,'rgba(90,72,48,.16)');g.addColorStop(1,'rgba(90,72,48,0)');x.fillStyle=g;x.fillRect(X-2,Y,32,14)}
+    {const g=x.createLinearGradient(0,h-70,0,h);g.addColorStop(0,'rgba(60,45,28,0)');g.addColorStop(1,'rgba(60,45,28,.22)');x.fillStyle=g;x.fillRect(0,h-70,w,70)}
+    {const g=x.createLinearGradient(0,0,0,16);g.addColorStop(0,'rgba(60,45,28,.28)');g.addColorStop(1,'rgba(60,45,28,0)');x.fillStyle=g;x.fillRect(0,0,w,16)}
+    x.fillStyle='rgba(255,255,255,.3)';x.fillRect(0,0,w,3)});
   const facEm=()=>canvasTex(256,256,(x,w,h)=>{x.fillStyle='#000';x.fillRect(0,0,w,h);
     for(let k=0;k<4;k++){if(Math.random()<.8){x.fillStyle='#FFB35C';x.fillRect(12+k*64,h-48,40,48)}}
     for(let r=0;r<4;r++)for(let k=0;k<4;k++)if(Math.random()<.5){const X=18+k*64,Y=14+r*44;x.fillStyle=Math.random()<.8?'#FFC877':'#CFE3FF';x.fillRect(X,Y,28,r===0?34:30)}});
@@ -2444,29 +2451,51 @@ function buildBoard(){
   const ring=(hx,hz,cut,ix,iz)=>{const sh=new THREE.Shape(),c=cut;sh.moveTo(-hx+c,-hz);sh.lineTo(hx-c,-hz);sh.lineTo(hx,-hz+c);sh.lineTo(hx,hz-c);sh.lineTo(hx-c,hz);sh.lineTo(-hx+c,hz);sh.lineTo(-hx,hz-c);sh.lineTo(-hx,-hz+c);sh.lineTo(-hx+c,-hz);
     if(ix>0&&iz>0){const h=new THREE.Path();h.moveTo(-ix,-iz);h.lineTo(-ix,iz);h.lineTo(ix,iz);h.lineTo(ix,-iz);h.lineTo(-ix,-iz);sh.holes.push(h)}return sh};
   const ext=(sh,o)=>{const g=new THREE.ExtrudeGeometry(sh,Object.assign({curveSegments:1,bevelEnabled:false},o));g.rotateX(-Math.PI/2);g.clearGroups();return g};
-  const TPL={};
-  const tpl=(hx,hz)=>{const k=hx.toFixed(3)+'x'+hz.toFixed(3);if(TPL[k])return TPL[k];const ix=hx-D,iz=hz-D;
-    const roof=ext(ring(hx-.032,hz-.032,CUT-.013,ix+.032,iz+.032),{depth:.003,bevelEnabled:true,bevelThickness:.052,bevelSize:.032,bevelSegments:1});
-    {roof.computeVertexNormals();const n=roof.attributes.normal,col=[],top=new THREE.Color(0x4F5B6E),slope=new THREE.Color(0x3E4859);for(let q=0;q<n.count;q++){const c=n.getY(q)>.9?top:slope;col.push(c.r,c.g,c.b)}roof.setAttribute('color',new THREE.Float32BufferAttribute(col,3))}
-    return TPL[k]={body:ext(ring(hx,hz,CUT,ix,iz),{depth:1,UVGenerator:UVG}),corn:ext(ring(hx+.007,hz+.007,CUT+.003,ix-.004,iz-.004),{depth:.012}),iron:ext(ring(hx+.004,hz+.004,CUT+.0015,ix-.002,iz-.002),{depth:.003}),roof}};
+  // chaque îlot = une rangée d'immeubles mitoyens : hauteurs, pierres et toits légèrement différents, murs pignons, cheminées sur les murs mitoyens
+  const roofProf=(()=>{const s=new THREE.Shape(),a=D/2,t=.032,hh=.052;s.moveTo(-a,0);s.lineTo(a,0);s.lineTo(a-t,hh);s.lineTo(-a+t,hh);s.lineTo(-a,0);
+    const g=new THREE.ExtrudeGeometry(s,{depth:1,bevelEnabled:false,curveSegments:1});g.translate(0,0,-.5);g.clearGroups();return g.toNonIndexed()})();
+  const tint=(g,top,slope)=>{g.computeVertexNormals();const n=g.attributes.normal,col=[];for(let q=0;q<n.count;q++){const c=n.getY(q)>.9?top:slope;col.push(c.r,c.g,c.b)}g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));return g};
+  const ZINC=[[0x4F5B6E,0x3E4859],[0x58647A,0x434E62],[0x4A5568,0x3A4455],[0x5B6577,0x47505F]].map(([a,b])=>[new THREE.Color(a),new THREE.Color(b)]);
+  const roofSeg=(x,y,z,len,alongX)=>{const [t,sl]=ZINC[Math.floor(rnd()*ZINC.length)];const g=roofProf.clone().applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),alongX?Math.PI/2:0),new THREE.Vector3(1,1,len)));return tint(g,t,sl)};
+  const bbox=(x,z,sx,h,sz,alongX)=>{const g=box.clone(),uv=g.attributes.uv;
+    for(let k=0;k<uv.count;k++){const f=Math.floor(k/4),fac2=alongX?(f===4||f===5):(f===0||f===1);
+      if(f===2||f===3)uv.setXY(k,.01,.4);else if(fac2)uv.setX(k,uv.getX(k)*(alongX?sx:sz)/.44);else uv.setXY(k,.004+uv.getX(k)*.01,.3+uv.getY(k)*.04)}
+    return g.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(x,CY+h/2,z),new THREE.Quaternion(),new THREE.Vector3(sx,h,sz))).toNonIndexed()};
+  const cornerShape=(sx,sy,d,c)=>{const p=[[-d,-d],[d,-d],[d,d],[-d,d]].map(([a,b])=>[a,b]);const k=p.findIndex(([a,b])=>Math.sign(a)===sx&&Math.sign(b)===sy);
+    const pts=[];p.forEach((q,i)=>{if(i!==k){pts.push(q);return}const prev=p[(i+3)%4],next=p[(i+1)%4];const toP=[Math.sign(prev[0]-q[0]),Math.sign(prev[1]-q[1])],toN=[Math.sign(next[0]-q[0]),Math.sign(next[1]-q[1])];
+      pts.push([q[0]+toP[0]*c,q[1]+toP[1]*c],[q[0]+toN[0]*c,q[1]+toN[1]*c])});const s=new THREE.Shape();pts.forEach(([a,b],i)=>i?s.lineTo(a,b):s.moveTo(a,b));s.lineTo(pts[0][0],pts[0][1]);return s};
+  const CT={},cornerT=(a,b)=>{const k=a+','+b;if(CT[k])return CT[k];
+    return CT[k]={body:ext(cornerShape(a,-b,D/2,CUT),{depth:1,UVGenerator:UVG}).toNonIndexed(),roof:ext(cornerShape(a,-b,D/2-.032,CUT-.013),{depth:.003,bevelEnabled:true,bevelThickness:.052,bevelSize:.032,bevelSegments:1}).toNonIndexed()}};
   const at=(g,x,y,z,sy=1)=>g.clone().applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion(),new THREE.Vector3(1,sy,1)));
-  BR.forEach(({X,Z,hx,hz})=>{const T=tpl(hx,hz);
-    const H=(rnd()<.18?.29:.265)+(rnd()-.5)*.01,v=Math.floor(rnd()*fac.length);
-    body[v].push(at(T.body,X,CY,Z,H));corn.push(at(T.corn,X,CY+H-.012,Z));
-    iron.push(at(T.iron,X,CY+H*.78,Z));iron.push(at(T.iron,X,CY+H*.36,Z));
-    roofs.push(at(T.roof,X,CY+H,Z));
-    // lucarnes régulières côté rue
-    const yy=CY+H+.024;
-    for(const [len,o,alongX] of[[hx,hz,1],[hz,hx,0]]){const n=Math.max(2,Math.round((2*len-2*CUT)/.068));for(let j=0;j<n;j++){const t=-len+CUT+.02+(j+.5)*(2*len-2*CUT-.04)/n;
-      for(const sg of[-1,1]){const dx=alongX?t:sg*(o-.017),dz=alongX?sg*(o-.017):t;dorm.push(bake(box,X+dx,yy,Z+dz,alongX?0:Math.PI/2,.022,.026,.018));dormRoof.push(bake(box,X+dx,yy+.016,Z+dz,alongX?0:Math.PI/2,.026,.007,.022))}}}
-    // souches de cheminée en briques et leurs pots en terre cuite, sur le faîte
-    for(const [len,o,alongX] of[[hx,hz,1],[hz,hx,0]]){const m=o-D/2,n=Math.max(2,Math.round(2*len/.2));for(let j=0;j<n;j++){if(rnd()<.25)continue;const t=-len+(j+.5)*2*len/n;
-      for(const sg of[-1,1]){if(rnd()<.3)continue;const cx=X+(alongX?t:sg*m),cz=Z+(alongX?sg*m:t),cy=CY+H+.062;chim.push(bake(box,cx,cy,cz,alongX?0:Math.PI/2,.014,.026,.04));
-        for(const q of[-.012,0,.012])pots.push(bake(potGeo,cx+(alongX?0:q),cy+.017,cz+(alongX?q:0),0,.004,.009,.004))}}}
-    // rotondes d'angle coiffées d'un petit dôme d'ardoise
-    for(const [a,b] of[[-1,-1],[1,-1],[1,1],[-1,1]]){if(rnd()>.2)continue;const cx=X+a*(hx-.038),cz=Z+b*(hz-.038);
-      rot.push(bake(potGeo,cx,CY+H+.04,cz,0,.03,.03,.03));domes.push(bake(domeGeo,cx,CY+H+.055,cz,0,.031,.04,.031));pots.push(bake(potGeo,cx,CY+H+.1,cz,0,.004,.012,.004))}
-    ao.push(bake(aoPl,X,CY+.002,Z,0,2*hx+.25,1,2*hz+.25))});
+  const ironB=[],ironG=new THREE.BoxGeometry(1,1,1);
+  const near=(px,pz,sx,sz)=>[[-1,-1],[1,-1],[1,1],[-1,1],[0,0]].some(([a,b])=>distAv(px+a*sx/2,pz+b*sz/2)<.072);
+  const buildBlock=({X,Z,hx,hz},cut)=>{
+    const H0=[.255,.268,.282][Math.floor(rnd()*3)];
+    const build=(px,pz,len,h,alongX,out)=>{const sx=alongX?len:D,sz=alongX?D:len,v=Math.floor(rnd()*fac.length);if(cut&&near(px,pz,sx,sz))return false;
+      body[v].push(bbox(px,pz,sx-.0008,h,sz-.0008,alongX));
+      corn.push(bake(box,px,CY+h-.005,pz,0,sx+.004,.01,sz+.004));
+      roofs.push(roofSeg(px,CY+h,pz,len,alongX));
+      // balcons filants côté rue
+      for(const f of[.36,.78]){const ox=alongX?0:out*(D/2+.002),oz=alongX?out*(D/2+.002):0;ironB.push(bake(ironG,px+ox,CY+h*f,pz+oz,0,alongX?len:.005,.004,alongX?.005:len))}
+      // lucarnes côté rue et côté cour
+      const n=Math.max(1,Math.round(len/.06));for(let j=0;j<n;j++){const t=(-len/2)+(j+.5)*len/n;for(const sg of[out,-out]){if(sg===-out&&rnd()<.5)continue;
+        const dx=alongX?t:sg*(D/2-.017),dz=alongX?sg*(D/2-.017):t;dorm.push(bake(box,px+dx,CY+h+.024,pz+dz,alongX?0:Math.PI/2,.021,.025,.018));dormRoof.push(bake(box,px+dx,CY+h+.039,pz+dz,alongX?0:Math.PI/2,.025,.007,.022))}}return true};
+    const party=(px,pz,h,alongX)=>{const cy=CY+h+.058;chim.push(bake(box,px,cy,pz,alongX?0:Math.PI/2,.012,.03,D*.5));
+      for(const q of[-.018,-.006,.006,.018])pots.push(bake(potGeo,px+(alongX?0:q),cy+.019,pz+(alongX?q:0),0,.0035,.009,.0035))};
+    for(const [len,o,alongX] of[[hx,hz,1],[hz,hx,0]])for(const sg of[-1,1]){
+      const L=2*(len-D),n=Math.max(2,Math.round(L/.11)),wts=[...Array(n)].map(()=>.7+rnd()*.6),sum=wts.reduce((a,b)=>a+b,0);let pos=-L/2,prevH=null;
+      wts.forEach((w,j)=>{const l=w/sum*L,c=pos+l/2,h=H0+[-.012,0,0,0,.014,.026][Math.floor(rnd()*6)];
+        const px=alongX?X+c:X+sg*(o-D/2),pz=alongX?Z+sg*(o-D/2):Z+c;const okB=build(px,pz,l,h,alongX,sg);
+        if(!okB){pos+=l;prevH=null;return}if(prevH!=null&&rnd()<.8)party(alongX?X+pos:px,alongX?pz:Z+pos,Math.max(h,prevH),alongX);pos+=l;prevH=h})}
+    // angles à pans coupés (souvent un peu plus hauts), parfois coiffés d'une rotonde
+    for(const [a,b] of[[-1,-1],[1,-1],[1,1],[-1,1]]){const T=cornerT(a,b),h=H0+.014,cx=X+a*(hx-D/2),cz=Z+b*(hz-D/2),v=Math.floor(rnd()*fac.length);if(cut&&near(cx,cz,D,D))continue;
+      body[v].push(at(T.body,cx,CY,cz,h));const [t,sl]=ZINC[Math.floor(rnd()*ZINC.length)];roofs.push(tint(at(T.roof,cx,CY+h,cz),t,sl));corn.push(bake(box,cx,CY+h-.005,cz,0,D+.004,.01,D+.004));
+      if(rnd()<.22){const rx=X+a*(hx-.038),rz=Z+b*(hz-.038);rot.push(bake(potGeo,rx,CY+h+.04,rz,0,.03,.03,.03));domes.push(bake(domeGeo,rx,CY+h+.055,rz,0,.031,.04,.031));pots.push(bake(potGeo,rx,CY+h+.1,rz,0,.004,.012,.004))}}
+    // un arbre dans certaines cours
+    if(cut)return;if(hx-D>.07&&hz-D>.07&&rnd()<.45)tree(X,Z,.75);
+    ao.push(bake(aoPl,X,CY+.002,Z,0,2*hx+.25,1,2*hz+.25))};
+  BR.forEach(b=>buildBlock(b,false));CUTB.forEach(([X,Z])=>buildBlock({X,Z,hx:HW,hz:HW},true));
+  merged(ironB,M(0x262A31,{roughness:.5,metalness:.4}),city,false);
   merged(rot,M(0xF1E9D6,{roughness:.8}),city);merged(domes,M(0x4F5B6E,{roughness:.45,metalness:.35}),city);
   body.forEach((b,k)=>merged(b,fac[k],city));
   merged(roofs,wetAdd(M(0xFFFFFF,{vertexColors:true,roughness:.62,metalness:.25,flatShading:true})),city);
@@ -2544,12 +2573,19 @@ function buildBoard(){
    for(let k=0;k<7;k++){const z=.25+k*.075,yy=.26-k*.034;mesh(new THREE.BoxGeometry(.16-k*.004,.022,.07),M(0xEDE5D3,{roughness:.8}),0,yy,z,g);
      for(const sx of[-1,1])mesh(new THREE.BoxGeometry(.01,.03,.07),wd,sx*(.085-k*.002),yy+.02,z,g)}
    g.position.set(2.25,CY,-2.55);city.add(g)}
-  // Louvre & pyramide
-  {const g=new THREE.Group(),lt=facade('#E8DDC3','#E8DDC3'),m=new THREE.MeshStandardMaterial({map:lt,roughness:.85}),roof=M(0x56657A,{roughness:.55,metalness:.25});
-   for(const [x,z,sx,sz] of[[0,-.42,1.1,.2],[-.45,-.12,.2,.6],[.45,-.12,.2,.6]]){mesh(new THREE.BoxGeometry(sx,.22,sz),m,x,.11,z,g);const r=mesh(new THREE.BoxGeometry(sx*.94,.07,sz*.7),roof,x,.255,z,g)}
-   const py=mesh(new THREE.ConeGeometry(.17,.22,4),new THREE.MeshPhysicalMaterial({color:0xBFE6F7,roughness:.05,metalness:.6,transparent:true,opacity:.8,envMapIntensity:1.5,clearcoat:1}),0,.11,.1,g);py.rotation.y=Math.PI/4;
-   for(const o of[-.25,.25]){const pp=mesh(new THREE.ConeGeometry(.05,.065,4),py.material,o,.033,.18,g);pp.rotation.y=Math.PI/4}
-   g.position.set(.45,CY,-1.5);city.add(g)}
+  // Louvre : ailes à toits mansardés, pavillons à hauts combles, cour pavée et pyramide de verre
+  {const X0=.45,Z0=-1.5,lt=facade('#ECE2CB','#ECE2CB');lt.wrapS=THREE.RepeatWrapping;const m=new THREE.MeshStandardMaterial({map:lt,roughness:.85,emissive:0xFFC27A,emissiveIntensity:0});glowMon.push(m);
+   const rm=M(0xFFFFFF,{vertexColors:true,roughness:.55,metalness:.3,flatShading:true}),pz=M(0x56657A,{roughness:.5,metalness:.35,flatShading:true}),gold=new THREE.MeshStandardMaterial({color:0xE2B33C,metalness:1,roughness:.25});
+   const court=mesh(new THREE.PlaneGeometry(.72,.44).rotateX(-Math.PI/2),M(0xE6DBC2,{roughness:.9}),X0,CY+.003,Z0-.1,city);court.castShadow=false;
+   const wing=(x,z,len,alongX)=>{const h=.2,g=bbox(X0+x,Z0+z,alongX?len:.14,h,alongX?.14:len,alongX);const w=new THREE.Mesh(g,m);w.castShadow=w.receiveShadow=true;city.add(w);
+     const r=new THREE.Mesh(roofSeg(X0+x,CY+h,Z0+z,len,alongX),rm);r.castShadow=true;city.add(r);mesh(new THREE.BoxGeometry(alongX?len+.004:.144,.01,alongX?.144:len+.004),M(0xF4ECDA),X0+x,CY+h-.005,Z0+z,city)};
+   const pav=(x,z)=>{const h=.25;const w=new THREE.Mesh(bbox(X0+x,Z0+z,.17,h,.17,true),m);w.castShadow=w.receiveShadow=true;city.add(w);
+     const r=mesh(new THREE.CylinderGeometry(.06,.122,.09,4,1).rotateY(Math.PI/4),pz,X0+x,CY+h+.045,Z0+z,city);mesh(new THREE.BoxGeometry(.05,.012,.012),gold,X0+x,CY+h+.095,Z0+z,city)};
+   wing(0,-.42,.92,1);wing(-.45,-.1,.5,0);wing(.45,-.1,.5,0);
+   pav(-.45,-.42);pav(.45,-.42);pav(0,-.42);pav(-.45,.2);pav(.45,.2);
+   const py=mesh(new THREE.ConeGeometry(.12,.15,4),new THREE.MeshPhysicalMaterial({color:0xBFE6F7,roughness:.05,metalness:.6,transparent:true,opacity:.82,envMapIntensity:1.5,clearcoat:1}),X0,CY+.075,Z0-.08,city);py.rotation.y=Math.PI/4;
+   for(const o of[-.2,.2]){const pp=mesh(new THREE.ConeGeometry(.035,.045,4),py.material,X0+o,CY+.023,Z0-.02,city);pp.rotation.y=Math.PI/4}
+   const pool=mesh(new THREE.PlaneGeometry(.12,.06).rotateX(-Math.PI/2),M(0x4F9BD0,{roughness:.1,metalness:.2}),X0,CY+.004,Z0+.08,city);pool.castShadow=false}
 
   // Invalides et son dôme doré
   {const g=new THREE.Group(),c=M(0xE9D9B6,{emissive:0xFFC27A,emissiveIntensity:0}),gold=new THREE.MeshStandardMaterial({color:0xE2B33C,metalness:1,roughness:.2,envMapIntensity:1.4});
