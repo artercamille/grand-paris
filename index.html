@@ -2258,7 +2258,7 @@ function buildBoard(){
   const curve=new THREE.CatmullRomCurve3([[-3.62,-.5],[-2.3,-.95],[-.7,-.35],[.8,.45],[2.3,.6],[3.62,.15]].map(p=>new THREE.Vector3(p[0],0,p[1])));
   const RP=curve.getPoints(260),distRiver=(x,z)=>{let m=9;for(const p of RP){const d=Math.hypot(p.x-x,p.z-z);if(d<m)m=d}return m};
   const ETO=[-2.45,-2.45],AV=[...Array(12)].map((_,k)=>k/12*Math.PI*2+.13);
-  const AVL=2.15,distAv=(x,z)=>{let m=9;const dx=x-ETO[0],dz=z-ETO[1];for(const a of AV){const ux=Math.cos(a),uz=Math.sin(a),t=dx*ux+dz*uz;if(t<0||t>AVL+.1)continue;const d=Math.abs(dx*uz-dz*ux);if(d<m)m=d}return m};
+  const AVL=2.15,avL=a=>{const c=Math.cos(a),s2=Math.sin(a);return c>.25&&s2>.25?AVL:.85},distAv=(x,z)=>{let m=9;const dx=x-ETO[0],dz=z-ETO[1];for(const a of AV){const ux=Math.cos(a),uz=Math.sin(a),t=dx*ux+dz*uz;if(t<0||t>avL(a)+.1)continue;const d=Math.abs(dx*uz-dz*ux);if(d<m)m=d}return m};
   const EIF=[-2.15,1.4],CDM={c:[-1.55,2.35],a:Math.atan2(2.35-1.4,-1.55+2.15),l:1.25,w:.5};
   const inRect=(x,z,R)=>{const dx=x-R.c[0],dz=z-R.c[1],u=dx*Math.cos(R.a)+dz*Math.sin(R.a),v=-dx*Math.sin(R.a)+dz*Math.cos(R.a);return Math.abs(u)<R.l/2+.2&&Math.abs(v)<R.w/2+.2};
   const TUI={c:[-.55,-1.55],a:0,l:.9,w:.42};
@@ -2273,7 +2273,7 @@ function buildBoard(){
   const HW=.2275,squares=[];{const ok=[];blocks.forEach(([X,Z])=>{const pts=[[-HW,-HW],[HW,-HW],[HW,HW],[-HW,HW],[0,-HW],[HW,0],[0,HW],[-HW,0]];(pts.some(([a,b])=>distAv(X+a,Z+b)<.075)?squares:ok).push([X,Z])});blocks.splice(0,blocks.length,...ok)}
   // un îlot coupé par une avenue garde les immeubles qui ne la touchent pas (îlot en biseau) ; s'il en reste trop peu, c'est un square
   const CUTB=[];{const keep=[];squares.forEach(([X,Z])=>{let n=0,t=0;for(let k=0;k<24;k++){const a=k/24*Math.PI*2,r=HW-.065,px=X+Math.max(-1,Math.min(1,Math.cos(a)*1.5))*r,pz=Z+Math.max(-1,Math.min(1,Math.sin(a)*1.5))*r;t++;if(distAv(px,pz)>.12)n++}
-    (n/t>=.45?CUTB:keep).push([X,Z])});squares.splice(0,squares.length,...keep)}
+    (n/t>=.62?CUTB:keep).push([X,Z])});squares.splice(0,squares.length,...keep)}
   // certains îlots voisins sont réunis en un seul long îlot (la rue entre eux disparaît)
   const BR=[];{const key=(X,Z)=>Math.round(X/.55)+','+Math.round(Z/.55),has=new Set(blocks.map(b=>key(...b))),used=new Set();
     blocks.forEach(([X,Z])=>{const k=key(X,Z);if(used.has(k))return;used.add(k);
@@ -2297,7 +2297,7 @@ function buildBoard(){
     {const U=C2(1)-C2(0);x.fillStyle='rgba(255,255,255,.8)';for(let i=-6;i<6;i++)for(let j=-6;j<6;j++){const cx=(i+.5)*.55,cz=(j+.5)*.55;if(Math.abs(cx)>3.4||Math.abs(cz)>3.4)continue;
       for(const sg of[-1,1])for(let k=-2;k<=2;k++){x.fillRect(C2(cx+sg*.062)-.011*U,C2(cz+k*.013)-.0035*U,.022*U,.007*U);x.fillRect(C2(cx+k*.013)-.0035*U,C2(cz+sg*.062)-.011*U,.007*U,.022*U)}}}
     // avenues depuis l'Étoile
-    x.strokeStyle='#7E7A75';x.lineWidth=C2(.13)-C2(0);x.lineCap='round';AV.forEach(a=>{x.beginPath();x.moveTo(C2(ETO[0]),C2(ETO[1]));x.lineTo(C2(ETO[0]+Math.cos(a)*AVL),C2(ETO[1]+Math.sin(a)*AVL));x.stroke()});
+    x.strokeStyle='#7E7A75';x.lineWidth=C2(.13)-C2(0);x.lineCap='round';AV.forEach(a=>{x.beginPath();x.moveTo(C2(ETO[0]),C2(ETO[1]));x.lineTo(C2(ETO[0]+Math.cos(a)*avL(a)),C2(ETO[1]+Math.sin(a)*avL(a)));x.stroke()});
     x.fillStyle='#7E7A75';x.beginPath();x.arc(C2(ETO[0]),C2(ETO[1]),C2(.62)-C2(0),0,7);x.fill();
     x.strokeStyle='rgba(255,255,255,.09)';x.lineWidth=.7;for(let r=4;r<C2(.62)-C2(0);r+=2.6){x.beginPath();x.arc(C2(ETO[0]),C2(ETO[1]),r,0,7);x.stroke()}
     x.strokeStyle='rgba(0,0,0,.08)';for(let a=0;a<Math.PI*2;a+=.05){x.beginPath();x.moveTo(C2(ETO[0]),C2(ETO[1]));x.lineTo(C2(ETO[0])+Math.cos(a)*(C2(.62)-C2(0)),C2(ETO[1])+Math.sin(a)*(C2(.62)-C2(0)));x.stroke()}
@@ -2385,17 +2385,16 @@ function buildBoard(){
     return{g,t,off,v:.004+rnd()*.003,wk}});
   // arbres, voitures, ombres de contact
   const fol=[],trunks=[],ao=[],cars=[];
-  const ico=new THREE.IcosahedronGeometry(1,1),trk=new THREE.CylinderGeometry(.7,1,1,5),aoPl=new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2);
+  const ico=new THREE.SphereGeometry(1,12,9),trk=new THREE.CylinderGeometry(.7,1,1,5),aoPl=new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2);
   const tree=(x,z,s=1)=>{trunks.push(bake(trk,x,CY+.05*s,z,0,.018*s,.1*s,.018*s));
-    s*=.85+rnd()*.3;const tc=new THREE.Color().setHSL(.25+rnd()*.06,.36+rnd()*.14,.2+rnd()*.08);fol.push(bake(ico,x,CY+.15*s,z,rnd()*3,.08*s,.085*s,.08*s,tc));
-    fol.push(bake(ico,x+.035*s,CY+.19*s,z-.02*s,rnd()*3,.055*s,.06*s,.055*s,tc.clone().offsetHSL(0,0,.05)));fol.push(bake(ico,x-.03*s,CY+.18*s,z+.03*s,rnd()*3,.05*s,.055*s,.05*s,tc.clone().offsetHSL(0,0,.03)));ao.push(bake(aoPl,x,CY+.002,z,0,.26*s,1,.26*s))};
+    const tc=new THREE.Color().setHSL(.27+rnd()*.025,.42+rnd()*.06,.2+rnd()*.025);fol.push(bake(ico,x,CY+.165*s,z,0,.078*s,.088*s,.078*s,tc));ao.push(bake(aoPl,x,CY+.002,z,0,.24*s,1,.24*s))};
   parks.forEach(([X,Z])=>{tree(X-.12,Z-.12,1.1);tree(X+.12,Z-.1,.95);tree(X-.1,Z+.13,1);tree(X+.13,Z+.12,.9)});
   for(let t=.01;t<.995;t+=.018)for(const sgn of[-1,1]){const p=curve.getPoint(t),d=curve.getTangent(t),l=Math.hypot(d.x,d.z),x=p.x+(-d.z/l)*.53*sgn,z=p.z+(d.x/l)*.53*sgn;
     if(Math.abs(x)>3.55||Math.abs(z)>3.55||bridges.some(b=>Math.hypot(b.x-x,b.z-z)<.2)||LM.some(L=>Math.hypot(x-L[0],z-L[1])<L[2]*.85))continue;tree(x,z,.75)}
-  AV.forEach(a=>{for(let r=.85;r<AVL;r+=.36)for(const s of[-1,1]){const x=ETO[0]+Math.cos(a)*r-Math.sin(a)*.085*s,z=ETO[1]+Math.sin(a)*r+Math.cos(a)*.085*s;
+  AV.forEach(a=>{for(let r=.85;r<avL(a);r+=.36)for(const s of[-1,1]){const x=ETO[0]+Math.cos(a)*r-Math.sin(a)*.085*s,z=ETO[1]+Math.sin(a)*r+Math.cos(a)*.085*s;
     if(Math.abs(x)>3.5||Math.abs(z)>3.5||distRiver(x,z)<.5||LM.slice(2).some(L=>Math.hypot(x-L[0],z-L[1])<L[2]))continue;tree(x,z,.7)}});
   for(const R of[CDM,TUI,INV])for(let u=-R.l/2+.08;u<=R.l/2;u+=.16)for(const s of[-1,1]){const v=s*(R.w/2-.07);tree(R.c[0]+u*Math.cos(R.a)-v*Math.sin(R.a),R.c[1]+u*Math.sin(R.a)+v*Math.cos(R.a),.8)}
-  for(let k=0;k<26;k++){const along=rnd()<.5,line=(Math.floor(rnd()*12)-6+.5)*.55,pos=(rnd()-.5)*6.4,x=along?pos:line,z=along?line:pos;
+  for(let k=0;k<0;k++){const along=rnd()<.5,line=(Math.floor(rnd()*12)-6+.5)*.55,pos=(rnd()-.5)*6.4,x=along?pos:line,z=along?line:pos;
     if(Math.abs(x)>3.4||Math.abs(z)>3.4||distRiver(x,z)<.55||busy(x,z)||inJoin(x,z))continue;
     const col=[0xE8312A,0xFFFFFF,0x2B5BD7,0x222831,0xF5C518,0x9AA4AE][k%6];cars.push(bake(new THREE.BoxGeometry(.075,.03,.036),x,CY+.02,z+(along?.035:0),along?0:Math.PI/2,1,1,1,col));
     cars.push(bake(new THREE.BoxGeometry(.04,.02,.03),x,CY+.043,z+(along?.035:0),along?0:Math.PI/2,1,1,1,0x1C2430))}
@@ -2405,13 +2404,13 @@ function buildBoard(){
    const lamp=(x,z)=>{poles.push(bake(cyl,x,CY+.05,z,0,.0045,.1,.0045));heads.push(bake(sph,x,CY+.104,z,0,.011,.013,.011))};
    for(let t=.01;t<.99;t+=.022)for(const sg of[-1,1]){const p=curve.getPoint(t),d=curve.getTangent(t),l=Math.hypot(d.x,d.z),x=p.x+(-d.z/l)*.43*sg,z=p.z+(d.x/l)*.43*sg;
      if(Math.abs(x)>3.58||Math.abs(z)>3.58||bridges.some(b=>Math.hypot(b.x-x,b.z-z)<.12))continue;lamp(x,z)}
-   AV.forEach(a=>{for(let r=.95;r<AVL;r+=.36)for(const sg of[-1,1]){const x=ETO[0]+Math.cos(a)*r-Math.sin(a)*.055*sg,z=ETO[1]+Math.sin(a)*r+Math.cos(a)*.055*sg;
+   AV.forEach(a=>{for(let r=.95;r<avL(a);r+=.36)for(const sg of[-1,1]){const x=ETO[0]+Math.cos(a)*r-Math.sin(a)*.055*sg,z=ETO[1]+Math.sin(a)*r+Math.cos(a)*.055*sg;
      if(Math.abs(x)>3.55||Math.abs(z)>3.55||distRiver(x,z)<.45||LM.slice(2).some(L=>Math.hypot(x-L[0],z-L[1])<L[2]))continue;lamp(x,z)}});
-   for(let i=-6;i<6;i++)for(let j=-6;j<6;j++){const x=(i+.5)*.55,z=(j+.5)*.55;if(Math.abs(x)>3.4||Math.abs(z)>3.4||distRiver(x,z)<.55||busy(x,z)||distAv(x,z)<.12||inJoin(x,z))continue;
+   if(0)for(let i=-6;i<6;i++)for(let j=-6;j<6;j++){const x=(i+.5)*.55,z=(j+.5)*.55;if(Math.abs(x)>3.4||Math.abs(z)>3.4||distRiver(x,z)<.55||busy(x,z)||distAv(x,z)<.12||inJoin(x,z))continue;
      const r=rnd();if(r<.18){green.push(bake(cyl,x+.04,CY+.026,z+.04,0,.014,.052,.014));green.push(bake(new THREE.SphereGeometry(1,8,5,0,Math.PI*2,0,Math.PI/2),x+.04,CY+.052,z+.04,0,.016,.012,.016))}
      else if(r<.28){green.push(bake(new THREE.BoxGeometry(1,1,1),x-.04,CY+.018,z+.04,0,.045,.036,.03));green.push(bake(new THREE.ConeGeometry(1,1,4).rotateY(Math.PI/4),x-.04,CY+.045,z+.04,0,.04,.02,.03))}
      else lamp(x+.045,z-.045)}
-   BR.forEach(({X,Z,hz})=>{if(rnd()>.3)return;const sideZ=rnd()<.5?-1:1,col=[0xD7263D,0xFFFFFF,0x1F7A4D,0xF2C14E][Math.floor(rnd()*4)];
+   BR.forEach(({X,Z,hz})=>{if(1)return;const sideZ=rnd()<.5?-1:1,col=[0xD7263D,0xFFFFFF,0x1F7A4D,0xF2C14E][Math.floor(rnd()*4)];
      for(let k=0;k<4;k++){const x=X-.15+k*.1,z=Z+sideZ*(hz+.0155);paras.push(bake(new THREE.ConeGeometry(1,1,8),x,CY+.05,z,0,.016,.012,.016,col));paras.push(bake(cyl,x,CY+.022,z,0,.002,.044,.002,0x333333))}});
    merged(poles,M(0x262B33,{roughness:.5,metalness:.4}),city);merged(heads,lampMat,city,false);merged(green,M(0x2E5E3A,{roughness:.6}),city);merged(paras,M(0xFFFFFF,{vertexColors:true,roughness:.7}),city)}
 
@@ -2478,19 +2477,19 @@ function buildBoard(){
       // balcons filants côté rue
       for(const f of[.36,.78]){const ox=alongX?0:out*(D/2+.002),oz=alongX?out*(D/2+.002):0;ironB.push(bake(ironG,px+ox,CY+h*f,pz+oz,0,alongX?len:.005,.004,alongX?.005:len))}
       // lucarnes côté rue et côté cour
-      const n=Math.max(1,Math.round(len/.06));for(let j=0;j<n;j++){const t=(-len/2)+(j+.5)*len/n;for(const sg of[out,-out]){if(sg===-out&&rnd()<.5)continue;
+      const n=Math.max(1,Math.round(len/.06));for(let j=0;j<n;j++){const t=(-len/2)+(j+.5)*len/n;for(const sg of[out,-out]){if(sg===-out)continue;
         const dx=alongX?t:sg*(D/2-.017),dz=alongX?sg*(D/2-.017):t;dorm.push(bake(box,px+dx,CY+h+.024,pz+dz,alongX?0:Math.PI/2,.021,.025,.018));dormRoof.push(bake(box,px+dx,CY+h+.039,pz+dz,alongX?0:Math.PI/2,.025,.007,.022))}}return true};
     const party=(px,pz,h,alongX)=>{const cy=CY+h+.058;chim.push(bake(box,px,cy,pz,alongX?0:Math.PI/2,.012,.03,D*.5));
-      for(const q of[-.018,-.006,.006,.018])pots.push(bake(potGeo,px+(alongX?0:q),cy+.019,pz+(alongX?q:0),0,.0035,.009,.0035))};
+    };
     for(const [len,o,alongX] of[[hx,hz,1],[hz,hx,0]])for(const sg of[-1,1]){
       const L=2*(len-D),n=Math.max(2,Math.round(L/.11)),wts=[...Array(n)].map(()=>.7+rnd()*.6),sum=wts.reduce((a,b)=>a+b,0);let pos=-L/2,prevH=null;
-      wts.forEach((w,j)=>{const l=w/sum*L,c=pos+l/2,h=H0+[-.012,0,0,0,.014,.026][Math.floor(rnd()*6)];
+      wts.forEach((w,j)=>{const l=w/sum*L,c=pos+l/2,h=H0+[0,0,0,.012][Math.floor(rnd()*4)];
         const px=alongX?X+c:X+sg*(o-D/2),pz=alongX?Z+sg*(o-D/2):Z+c;const okB=build(px,pz,l,h,alongX,sg);
-        if(!okB){pos+=l;prevH=null;return}if(prevH!=null&&rnd()<.8)party(alongX?X+pos:px,alongX?pz:Z+pos,Math.max(h,prevH),alongX);pos+=l;prevH=h})}
+        if(!okB){pos+=l;prevH=null;return}if(prevH!=null&&rnd()<.45)party(alongX?X+pos:px,alongX?pz:Z+pos,Math.max(h,prevH),alongX);pos+=l;prevH=h})}
     // angles à pans coupés (souvent un peu plus hauts), parfois coiffés d'une rotonde
     for(const [a,b] of[[-1,-1],[1,-1],[1,1],[-1,1]]){const T=cornerT(a,b),h=H0+.014,cx=X+a*(hx-D/2),cz=Z+b*(hz-D/2),v=Math.floor(rnd()*fac.length);if(cut&&near(cx,cz,D,D))continue;
       body[v].push(at(T.body,cx,CY,cz,h));const [t,sl]=ZINC[Math.floor(rnd()*ZINC.length)];roofs.push(tint(at(T.roof,cx,CY+h,cz),t,sl));corn.push(bake(box,cx,CY+h-.005,cz,0,D+.004,.01,D+.004));
-      if(rnd()<.22){const rx=X+a*(hx-.038),rz=Z+b*(hz-.038);rot.push(bake(potGeo,rx,CY+h+.04,rz,0,.03,.03,.03));domes.push(bake(domeGeo,rx,CY+h+.055,rz,0,.031,.04,.031));pots.push(bake(potGeo,rx,CY+h+.1,rz,0,.004,.012,.004))}}
+      if(rnd()<.12){const rx=X+a*(hx-.038),rz=Z+b*(hz-.038);rot.push(bake(potGeo,rx,CY+h+.04,rz,0,.03,.03,.03));domes.push(bake(domeGeo,rx,CY+h+.055,rz,0,.031,.04,.031));pots.push(bake(potGeo,rx,CY+h+.1,rz,0,.004,.012,.004))}}
     // un arbre dans certaines cours
     if(cut)return;if(hx-D>.07&&hz-D>.07&&rnd()<.45)tree(X,Z,.75);
     ao.push(bake(aoPl,X,CY+.002,Z,0,2*hx+.25,1,2*hz+.25))};
@@ -2515,15 +2514,15 @@ function buildBoard(){
   {const g=new THREE.Group(),Hh=2.6,N=27;
    const prof=[...Array(N)].map((_,k)=>{const y=k/(N-1)*Hh;return new THREE.Vector2(.013+.47*Math.exp(-y*1.55)-.02*y/Hh,y)});
    const lat=canvasTex(256,1024,(x,w,h)=>{x.clearRect(0,0,w,h);x.strokeStyle='#fff';x.fillStyle='#fff';
-     x.lineWidth=14;x.strokeRect(7,0,w-14,h);
-     const rows=26;for(let r=0;r<rows;r++){const y0=r*h/rows,y1=(r+1)*h/rows;x.lineWidth=5;x.beginPath();x.moveTo(0,y0);x.lineTo(w,y0);x.stroke();
-       x.lineWidth=3.5;x.beginPath();x.moveTo(8,y0);x.lineTo(w-8,y1);x.moveTo(w-8,y0);x.lineTo(8,y1);x.stroke()}
+     x.lineWidth=22;x.strokeRect(11,0,w-22,h);
+     const rows=26;for(let r=0;r<rows;r++){const y0=r*h/rows,y1=(r+1)*h/rows;x.lineWidth=8;x.beginPath();x.moveTo(0,y0);x.lineTo(w,y0);x.stroke();
+       x.lineWidth=6;x.beginPath();x.moveTo(8,y0);x.lineTo(w-8,y1);x.moveTo(w-8,y0);x.lineTo(8,y1);x.stroke()}
      x.globalCompositeOperation='destination-out';x.beginPath();x.ellipse(w/2,h,w*.34,h*.11,0,0,7);x.fill();x.globalCompositeOperation='source-over';
      x.lineWidth=9;x.beginPath();x.ellipse(w/2,h,w*.34,h*.11,0,Math.PI,2*Math.PI);x.stroke()});
    lat.wrapS=THREE.RepeatWrapping;lat.repeat.set(4,1);lat.encoding=THREE.sRGBEncoding;
-   const bronze=eiffelMat=new THREE.MeshStandardMaterial({emissive:0xFFA83A,emissiveIntensity:0,color:0x7E5E43,map:lat,alphaTest:.5,side:THREE.DoubleSide,roughness:.45,metalness:.45,envMapIntensity:.7});
+   const bronze=eiffelMat=new THREE.MeshStandardMaterial({emissive:0xFFA83A,emissiveIntensity:0,color:0x6A4E38,map:lat,alphaTest:.5,side:THREE.DoubleSide,roughness:.45,metalness:.45,envMapIntensity:.7});
    const tw=new THREE.Mesh(new THREE.LatheGeometry(prof,4,Math.PI/4),bronze);tw.castShadow=true;tw.customDepthMaterial=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking,map:lat,alphaTest:.5});g.add(tw);
-   const solid=new THREE.MeshStandardMaterial({color:0x7E5E43,roughness:.45,metalness:.45});
+   const solid=new THREE.MeshStandardMaterial({color:0x6A4E38,roughness:.45,metalness:.45});
    const rAt=y=>.013+.47*Math.exp(-y*1.55)-.02*y/Hh;
    for(const [y,e] of[[.62,.07],[1.32,.05],[2.32,.035]]){const s=rAt(y)*Math.SQRT2+.07;mesh(new THREE.BoxGeometry(s,e,s),solid,0,y,0,g)}
    mesh(new THREE.CylinderGeometry(.006,.01,.25,6),solid,0,Hh+.1,0,g);
