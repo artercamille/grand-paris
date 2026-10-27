@@ -579,6 +579,45 @@ button.dlog:hover{filter:brightness(1.06)}button.dlog:active{transform:translate
 }
 @media (hover:none){.gb kbd{display:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ---------- choix du pion (v29) ---------- */
+.lookb{--pc:#888;flex:none;display:flex;align-items:center;gap:2px;padding:3px 10px 3px 3px;border-radius:var(--r-pill);border:3px solid #fff;background:linear-gradient(180deg,#fff,#F1EEE6);color:var(--ink);font-family:var(--body);font-weight:900;font-size:var(--t-xs);box-shadow:0 3px 0 rgba(0,0,0,.22),0 0 0 2px var(--pc) inset;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.lookb:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 5px 0 rgba(0,0,0,.22),0 0 0 3px var(--pc) inset}
+.lookb .pwi{width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 50% 70%,color-mix(in srgb,var(--pc) 32%,#fff),#fff 72%);object-fit:contain}
+.lookb .lkl{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.lookb .lkl .i{width:14px;height:14px;color:var(--pc)}
+.pwi.svg{display:grid;place-items:center}.pwi.svg svg{width:62%;height:62%}
+.slot .lookb{margin-left:auto}.slot.mine .lookb+.rdy{margin-left:6px}
+.sheet.look{width:min(660px,100%)}.sheet.look .sb{padding-top:12px}
+.lkhero{--pc:#888;display:flex;align-items:center;gap:18px;padding:12px 16px;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--pc) 22%,#fff),#fff 70%);box-shadow:inset 0 0 0 3px color-mix(in srgb,var(--pc) 55%,#fff)}
+.lkstage{width:118px;height:118px;flex:none;border-radius:50%;background:radial-gradient(circle at 50% 65%,color-mix(in srgb,var(--pc) 45%,#fff),transparent 70%);display:grid;place-items:center}
+.lkstage .pwi.big{width:128px;height:128px;animation:lkspin 3.2s ease-in-out infinite}
+@keyframes lkspin{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+.lkinfo{display:grid;gap:4px}.lkinfo b{font-family:var(--display);font-size:28px;line-height:1}.lkinfo small{color:var(--ink2);font-weight:800}
+.lkchip{justify-self:start;display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:3px 10px;border-radius:var(--r-pill);background:var(--pc);color:#fff;font-weight:900;font-size:var(--t-xs)}.lkchip .i{width:13px;height:13px}
+.lkh{margin:12px 0 6px;font-family:var(--display);font-size:18px;color:var(--ink2)}
+.lkgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.lkt{--pc:#888;position:relative;display:grid;justify-items:center;gap:2px;padding:8px 6px 10px;border-radius:16px;border:3px solid var(--line);background:#fff;cursor:pointer;font-family:var(--body);color:var(--ink);transition:transform .15s,border-color .15s,box-shadow .15s}
+.lkt .pwi{width:72px;height:72px}.lkt b{font-weight:900;font-size:var(--t-xs)}
+.lkt:hover:not(:disabled){transform:translateY(-3px);border-color:color-mix(in srgb,var(--pc) 60%,#fff)}
+.lkt[aria-pressed="true"]{border-color:var(--pc);box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 35%,transparent),0 4px 0 rgba(0,0,0,.12);background:color-mix(in srgb,var(--pc) 10%,#fff)}
+.lkt[aria-pressed="true"]::after{content:'';position:absolute;top:6px;right:6px;width:12px;height:12px;border-radius:50%;background:var(--pc);box-shadow:0 0 0 3px #fff}
+.lkt:disabled{cursor:not-allowed;opacity:.55;filter:grayscale(.85)}
+.lkt em{position:absolute;left:4px;right:4px;bottom:26px;font-style:normal;font-weight:900;font-size:11px;background:rgba(20,24,36,.82);color:#fff;border-radius:8px;padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lkcols{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.lkc{--dc:#888;width:46px;height:46px;border-radius:50%;border:4px solid #fff;background:var(--dc);color:#fff;display:grid;place-items:center;box-shadow:0 3px 0 rgba(0,0,0,.25);cursor:pointer;transition:transform .15s}
+.lkc .i{width:22px;height:22px;stroke-width:3.2}.lkc:hover:not(:disabled){transform:scale(1.12)}
+.lkc[aria-pressed="true"]{transform:scale(1.15);box-shadow:0 0 0 3px var(--dc),0 3px 0 rgba(0,0,0,.25)}
+.lkc:disabled{cursor:not-allowed;opacity:.35}
+.lkbt{display:flex;justify-content:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+@media (max-width:640px){.lkgrid{grid-template-columns:repeat(3,1fr)}}@media (max-width:560px){.lkhero{flex-direction:column;text-align:center}.lkinfo{justify-items:center}.lkchip{justify-self:center}}
+/* ---------- bots ---------- */
+.botav{background:var(--pc)!important;color:#fff!important}.botav svg{width:60%;height:60%}
+.botc{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;background:rgba(0,0,0,.28);color:#fff;font-family:var(--body);font-weight:900;font-size:10px;letter-spacing:.06em;vertical-align:middle;text-shadow:none}
+.slot .botc{margin:0 2px}
+.addrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}.addrow .slot.empty{justify-content:center;gap:6px;cursor:pointer}.addrow .i{width:16px;height:16px}
+
+.timer.afk{margin-top:8px}.sumline.bank{font-weight:700;font-size:var(--t-sm);margin-top:-4px}.sumline.bank em{color:var(--red);font-style:normal;font-weight:900}
+.tchip.gojc i{background:#F7941D!important}
 </style>
 
 <main id="home" lang="fr"></main>
@@ -754,6 +793,8 @@ const SQ=[
 ];
 const GSQ=[[1,3],[6,8,9],[11,13,14],[16,18,19],[21,23,24],[26,27,29],[31,32,34],[37,39]];
 const HC=[50,50,100,100,150,150,200,200];
+// règles officielles : la banque n'a que 32 maisons et 12 hôtels ; les cartes « sortie de prison » quittent le paquet tant qu'on les garde
+const HOUSES=32,HOTELS=12,GOJK={ch:8,cc:4};
 const GARES=[5,15,25,35], UTILS=[12,28];
 const PCOL=['#D9412B','#2F7FD1','#2E9E5B','#D99A12','#8A4FC7','#159C9C','#E0569B','#5A6478'];
 const buyable=i=>['st','gr','ut'].includes(SQ[i].t);
@@ -771,7 +812,7 @@ ch:[
  ['Prenez le train jusqu’à la gare la plus proche. Si elle a un propriétaire, payez-lui le double du loyer.',(S,p)=>moveTo(S,p,nextOf(S.players[p].pos,GARES),{mult:2})],
  ['Allez à la compagnie la plus proche. Si elle a un propriétaire, payez-lui 10 fois le total des dés.',(S,p)=>moveTo(S,p,nextOf(S.players[p].pos,UTILS),{u10:1})],
  ['Votre banque vous verse un dividende de 50 €.',(S,p)=>gain(S,p,50)],
- ['Libéré sous caution : gardez cette carte pour sortir de prison.',(S,p)=>{S.players[p].goj++}],
+ ['Libéré sous caution : gardez cette carte pour sortir de prison.',(S,p)=>takeGoj(S,p,'ch')],
  ['Reculez de trois cases.',(S,p)=>{const P=S.players[p];P.pos=(P.pos+37)%40;land(S,p,{})}],
  ['Contrôle de police : allez directement en prison, sans passer par Départ.',(S,p)=>goJail(S,p)],
  ['Ravalement de façade : payez 25 € par maison et 100 € par hôtel.',(S,p)=>repairs(S,p,25,100)],
@@ -785,7 +826,7 @@ cc:[
  ['Erreur de la banque en votre faveur : recevez 200 €.',(S,p)=>gain(S,p,200)],
  ['Consultation chez le médecin : payez 50 €.',(S,p)=>fine(S,p,50)],
  ['Vous revendez vos actions : recevez 50 €.',(S,p)=>gain(S,p,50)],
- ['Un ami avocat vous tire d’affaire : gardez cette carte pour sortir de prison.',(S,p)=>{S.players[p].goj++}],
+ ['Un ami avocat vous tire d’affaire : gardez cette carte pour sortir de prison.',(S,p)=>takeGoj(S,p,'cc')],
  ['Allez directement en prison, sans passer par Départ.',(S,p)=>goJail(S,p)],
  ['Votre livret arrive à échéance : recevez 100 €.',(S,p)=>gain(S,p,100)],
  ['Remboursement d’impôts : recevez 20 €.',(S,p)=>gain(S,p,20)],
@@ -821,6 +862,11 @@ function rentOf(S,i,o={}){
   if(s.t==='ut'){const both=UTILS.every(x=>S.own[x]&&S.own[x][0]===w[0]);return((o.u10||both)?10:4)*S.lastSum}
   return 0;
 }
+function takeGoj(S,p,d){const P=S.players[p];P.goj++;(P.gj=P.gj||[]).push(d)}
+function backGoj(S,P,n=P.goj){for(let k=0;k<n;k++){const d=(P.gj||[]).pop()||(S.decks.ch.includes(GOJK.ch)?'cc':'ch');if(!S.decks[d].includes(GOJK[d]))S.decks[d].push(GOJK[d])}P.goj-=n}
+function giveGoj(S,a,b,n){const A=S.players[a],B=S.players[b];for(let k=0;k<n;k++){const d=(A.gj||[]).pop();if(d)(B.gj=B.gj||[]).push(d)}A.goj-=n;B.goj+=n}
+function stock(S){let h=0,H=0;S.own.forEach(w=>{if(w){if(w[1]===5)H++;else h+=w[1]}});return[HOUSES-h,HOTELS-H]}
+const intr=(S,L)=>L.reduce((a,i)=>a+(S.own[i]&&S.own[i][2]?Math.round(SQ[i].p*.05):0),0);
 function goJail(S,p){const P=S.players[p];if(S.st)S.st.j[p]=(S.st.j[p]||0)+1;P.pos=10;P.inJail=true;P.jail=0;S.again=false;S.dbl=0;S.stage='done';log(S,`${P.n} part en prison.`)}
 function repairs(S,p,h,ho){let t=0;S.own.forEach(w=>{if(w&&w[0]===p)t+=w[1]===5?ho:w[1]*h});fine(S,p,t);log(S,`${nm(S,p)} paie ${t} € de travaux.`)}
 function move(S,p,n){const P=S.players[p];P.pos+=n;if(P.pos>=40){P.pos-=40;P.money+=200;log(S,`${P.n} passe par Départ : +200 €.`)}land(S,p,{})}
@@ -838,7 +884,7 @@ function land(S,p,o){
   if(s.t==='tax'){fine(S,p,s.amt);log(S,`${P.n} paie ${s.amt} € (${s.n}).`);return}
   if(s.t==='gojail'){goJail(S,p);return}
   if(s.t==='ch'||s.t==='cc'){
-    const D=S.decks[s.t],k=D.shift();D.push(k);const c=CARDS[s.t][k];
+    const D=S.decks[s.t],k=D.shift();if(k!==GOJK[s.t])D.push(k);const c=CARDS[s.t][k];
     S.card={d:s.t,k,p};log(S,`${P.n} tire une carte ${s.t==='ch'?'Chance':'Caisse commune'}.`);c[1](S,p);
   }
 }
@@ -849,27 +895,38 @@ function nextTurn(S){
   for(let k=1;k<=n;k++){const c=(S.turn+k)%n;if(!S.players[c].out){t=c;break}}
   if(t<=S.turn)S.rnd=(S.rnd||1)+1;
   S.turn=t;S.stage='roll';
-  if(S.opt&&S.opt.turns&&S.rnd>S.opt.turns){const L=live(S).sort((a,b)=>worthOf(S,b)-worthOf(S,a));S.phase='over';S.winner=L[0];log(S,`Temps écoulé ! ${nm(S,L[0])} est le plus riche et gagne.`)}
+  if(S.opt&&S.opt.turns&&S.rnd>S.opt.turns){const L=live(S).sort((a,b)=>worthOf(S,b)-worthOf(S,a));S.phase='over';S.winner=L[0];log(S,`Temps écoulé ! ${nm(S,L[0])} est le plus riche et gagne.`);return}
+  // biens d'un joueur ruiné par la banque : mis aux enchères un par un
+  if(S.liq&&S.liq.length)startAuction(S,S.liq.shift(),'roll');
 }
-function startAuction(S,i){
+function startAuction(S,i,back){
   const n=S.players.length,ord=[];
   for(let k=0;k<n;k++){const c=(S.turn+k)%n;if(!S.players[c].out)ord.push(c)}
-  S.auc={sq:i,bid:0,by:-1,ord,i:0};S.pend=null;S.stage='auction';log(S,`Enchères pour ${SQ[i].n} !`);
+  S.auc={sq:i,bid:0,by:-1,ord,i:0};if(back)S.auc.back=back;S.pend=null;S.stage='auction';log(S,`Enchères pour ${SQ[i].n}${back?' (vente de la banque)':''} !`);
 }
 function checkAuction(S){
   const A=S.auc;
   if(A.ord.length===0||(A.ord.length===1&&A.by===A.ord[0])){
     if(A.by>=0){pay(S,A.by,A.bid,-1);S.own[A.sq]=[A.by,0,0];log(S,`${nm(S,A.by)} remporte ${SQ[A.sq].n} pour ${A.bid} €.`)}
     else log(S,`Personne n’a enchéri sur ${SQ[A.sq].n}.`);
-    S.auc=null;S.stage=after(S);
+    const back=A.back||after(S);S.auc=null;S.stage=back;
+    if(S.liq&&S.liq.length)startAuction(S,S.liq.shift(),back);
   }
 }
 const groupFree=(S,i)=>SQ[i].t!=='st'||GSQ[SQ[i].g].every(x=>!S.own[x]||S.own[x][1]===0);
 function bankrupt(S,p){
   const P=S.players[p];let c=P.debtTo??-1;if(c>=0&&S.players[c].out)c=-1;
-  S.own.forEach((w,i)=>{if(w&&w[0]===p)S.own[i]=c>=0?[c,0,w[2]]:null});
-  if(c>=0)S.players[c].goj+=P.goj;
-  P.goj=0;P.money=0;P.out=true;log(S,`${P.n} fait faillite${c>=0?` au profit de ${nm(S,c)}`:''}.`);
+  const mine=S.own.map((w,i)=>w&&w[0]===p?i:-1).filter(i=>i>=0);
+  // les bâtiments sont revendus à la banque (moitié du prix)
+  const hv=mine.reduce((a,i)=>a+S.own[i][1]*HC[SQ[i].g]/2,0);
+  if(c>=0){const C=S.players[c];
+    // le créancier récupère tout ce que possède le ruiné, rien de plus : l'argent restant, la revente des bâtiments, les rues, les cartes
+    C.money+=P.money+hv;mine.forEach(i=>{S.own[i]=[c,0,S.own[i][2]]});if(P.goj)giveGoj(S,p,c,P.goj);
+    const it=intr(S,mine);log(S,`${P.n} fait faillite : ${C.n} récupère tous ses biens.`);
+    if(it){pay(S,c,it,-1);log(S,`${C.n} paie ${it} € d’intérêts sur les rues hypothéquées reçues.`)}}
+  else{mine.forEach(i=>{S.own[i]=null});if(P.goj)backGoj(S,P);if(mine.length)S.liq=(S.liq||[]).concat(mine);
+    log(S,`${P.n} fait faillite${mine.length?' : la banque met ses rues aux enchères':''}.`)}
+  P.goj=0;P.gj=[];P.money=0;P.out=true;
   if(S.trade&&(S.trade.f===p||S.trade.t===p))S.trade=null;
   if(S.auc){const k=S.auc.ord.indexOf(p);if(k>=0){S.auc.ord.splice(k,1);if(S.auc.i>=S.auc.ord.length)S.auc.i=0;if(S.auc.by===p){S.auc.by=-1;S.auc.bid=0}}if(S.turn!==p)checkAuction(S)}
   const L=live(S);if(L.length===1){S.phase='over';S.winner=L[0];log(S,`${nm(S,L[0])} remporte la partie !`);return}
@@ -904,7 +961,7 @@ function apply(S,p,a){
     fine(S,p,50);P.inJail=false;P.jail=0;log(S,`${P.n} paie 50 € pour sortir de prison.`);return null;
   case 'usecard':
     if(!cur||S.stage!=='roll'||!P.inJail||P.goj<1)return 'Pas maintenant.';
-    P.goj--;P.inJail=false;P.jail=0;log(S,`${P.n} utilise sa carte et sort de prison.`);return null;
+    backGoj(S,P,1);P.inJail=false;P.jail=0;log(S,`${P.n} utilise sa carte et sort de prison.`);return null;
   case 'buy':{
     if(!cur||S.stage!=='buy')return 'Pas maintenant.';
     const k=S.pend,pr=SQ[k].p;if(P.money<pr)return 'Pas assez d’argent.';
@@ -925,12 +982,14 @@ function apply(S,p,a){
     const G=GSQ[s.g];if(G.some(x=>S.own[x][2]))return 'Une rue de la couleur est hypothéquée.';
     if(w[1]>=5)return 'Déjà un hôtel.';
     if(w[1]>Math.min(...G.map(x=>S.own[x][1])))return 'Construis de façon équilibrée.';
+    {const[hs,ht]=stock(S);if(w[1]<4&&hs<1)return 'La banque n’a plus de maisons.';if(w[1]===4&&ht<1)return 'La banque n’a plus d’hôtels.'}
     if(P.money<HC[s.g])return 'Pas assez d’argent.';
     pay(S,p,HC[s.g],-1);w[1]++;log(S,`${P.n} construit ${w[1]===5?'un hôtel':'une maison'} sur ${s.n}.`);return null}
   case 'sell':{
     if(!s||s.t!=='st'||!w||w[0]!==p||w[1]<1)return 'Rien à vendre.';
     const G=GSQ[s.g];if(w[1]<Math.max(...G.map(x=>S.own[x][1])))return 'Vends de façon équilibrée.';
-    w[1]--;gain(S,p,HC[s.g]/2);log(S,`${P.n} revend un bâtiment sur ${s.n} (+${HC[s.g]/2} €).`);return null}
+    if(w[1]===5){const k=Math.min(4,stock(S)[0]),g=(5-k)*HC[s.g]/2;w[1]=k;gain(S,p,g);log(S,k===4?`${P.n} revend l’hôtel de ${s.n} (+${g} €).`:`Plus assez de maisons en banque : ${P.n} revend l’hôtel de ${s.n} et ${4-k} maison${4-k>1?'s':''} (+${g} €).`);return null}
+    w[1]--;gain(S,p,HC[s.g]/2);log(S,`${P.n} revend une maison sur ${s.n} (+${HC[s.g]/2} €).`);return null}
   case 'mort':
     if(!w||w[0]!==p||w[2])return 'Impossible.';
     if(!groupFree(S,i))return 'Vends d’abord les maisons de la couleur.';
@@ -949,18 +1008,23 @@ function apply(S,p,a){
   case 'propose':{
     if(S.trade)return 'Un échange est déjà en cours.';
     const q=a.to,Q=S.players[q];if(!Q||Q.out||q===p)return 'Choisis un partenaire.';
-    const gp=(a.gp||[]).map(Number),rp=(a.rp||[]).map(Number),gm=Math.max(0,Math.floor(a.gm||0)),rm=Math.max(0,Math.floor(a.rm||0));
-    if(!gp.length&&!rp.length&&!gm&&!rm)return 'L’offre est vide.';
+    const gp=[...new Set((a.gp||[]).map(Number))],rp=[...new Set((a.rp||[]).map(Number))],gm=Math.max(0,Math.floor(a.gm||0)),rm=Math.max(0,Math.floor(a.rm||0)),gc=Math.max(0,Math.floor(a.gc||0)),rc=Math.max(0,Math.floor(a.rc||0));
+    if(!gp.length&&!rp.length&&!gm&&!rm&&!gc&&!rc)return 'L’offre est vide.';
     if(gp.some(x=>!tradeable(S,p,x))||rp.some(x=>!tradeable(S,q,x)))return 'Propriété non échangeable (maisons ?).';
+    if(gc>P.goj||rc>Q.goj)return 'Carte « sortie de prison » introuvable.';
     if(gm>P.money)return 'Tu n’as pas assez d’argent.';
-    S.trade={f:p,t:q,gp,rp,gm,rm};log(S,`${P.n} propose un échange à ${Q.n}.`);return null}
+    if(P.money-gm+rm-intr(S,rp)<0)return 'Pas assez d’argent pour les intérêts des rues hypothéquées (10 %).';
+    S.trade={f:p,t:q,gp,rp,gm,rm};if(gc)S.trade.gc=gc;if(rc)S.trade.rc=rc;log(S,`${P.n} propose un échange à ${Q.n}.`);return null}
   case 'accept':{
     const T=S.trade;if(!T||T.t!==p)return 'Aucune offre pour toi.';
     const F=S.players[T.f];
     if(T.gp.some(x=>!tradeable(S,T.f,x))||T.rp.some(x=>!tradeable(S,p,x)))return 'L’offre n’est plus valable.';
-    if(F.money<T.gm)return `${F.n} n’a plus assez d’argent.`;if(P.money<T.rm)return 'Pas assez d’argent.';
-    T.gp.forEach(x=>S.own[x][0]=p);T.rp.forEach(x=>S.own[x][0]=T.f);
-    pay(S,T.f,T.gm,p);pay(S,p,T.rm,T.f);S.trade=null;log(S,`${P.n} accepte l’échange avec ${F.n}.`);return null}
+    const gc=T.gc||0,rc=T.rc||0,ig=intr(S,T.gp),ir=intr(S,T.rp);
+    if(gc>F.goj||rc>P.goj)return 'L’offre n’est plus valable.';
+    if(F.money<T.gm||F.money-T.gm+T.rm-ir<0)return `${F.n} n’a plus assez d’argent.`;if(P.money<T.rm||P.money-T.rm+T.gm-ig<0)return ig?'Pas assez d’argent (intérêts d’hypothèque compris).':'Pas assez d’argent.';
+    T.gp.forEach(x=>S.own[x][0]=p);T.rp.forEach(x=>S.own[x][0]=T.f);if(gc)giveGoj(S,T.f,p,gc);if(rc)giveGoj(S,p,T.f,rc);
+    pay(S,T.f,T.gm,p);pay(S,p,T.rm,T.f);S.trade=null;log(S,`${P.n} accepte l’échange avec ${F.n}.`);
+    if(ig){pay(S,p,ig,-1);log(S,`${P.n} paie ${ig} € d’intérêts d’hypothèque.`)}if(ir){pay(S,T.f,ir,-1);log(S,`${F.n} paie ${ir} € d’intérêts d’hypothèque.`)}return null}
   case 'refuse':{
     const T=S.trade;if(!T||T.t!==p)return 'Aucune offre pour toi.';S.trade=null;log(S,`${P.n} refuse l’échange.`);return null}
   case 'cancel':{
@@ -974,7 +1038,7 @@ function newGame(pl,opt={}){
   const usedT=new Set(),usedC=new Set();
   const pls=pl.map((x,i)=>{let t=Number.isInteger(x.t)&&x.t>=0&&x.t<6&&!usedT.has(x.t)?x.t:-1;if(t<0){t=[0,1,2,3,4,5].find(v=>!usedT.has(v))??i%6}usedT.add(t);
     let c=PCOL.includes(x.c)&&!usedC.has(x.c)?x.c:null;if(!c){c=PCOL.find(v=>!usedC.has(v))||PCOL[i%PCOL.length]}usedC.add(c);
-    return {n:x.n,c,t,peer:x.peer||null,money:o.money,pos:0,inJail:false,jail:0,goj:0,out:false}});
+    return Object.assign({n:x.n,c,t,peer:x.peer||null,money:o.money,pos:0,inJail:false,jail:0,goj:0,gj:[],out:false},x.bot?{bot:1}:{})});
   return {gid:Math.random().toString(36).slice(2,8),v:1,phase:'play',opt:o,pot:0,rnd:1,st:{r:pls.map(()=>0),j:pls.map(()=>0),big:[0,-1,-1],sq:{}},
     players:pls,
     own:Array(40).fill(null),turn:0,stage:'roll',dice:[3,4],dbl:0,again:false,lastSum:0,roll:0,pend:null,auc:null,trade:null,card:null,
@@ -1003,6 +1067,7 @@ function doAct(p,a){
 }
 function perform(p,a){
   if(!S)return;
+  if(typeof UI!=='undefined'&&UI.afkMark)delete UI.afkMark[p];
   if(mode==='local'||isHost)return doAct(p,a);
   if(groom)groom.emit('act',a).catch(()=>toast('Connexion perdue, réessaie.'));
 }
@@ -1026,13 +1091,102 @@ async function enterRoom(c,host){
   groom.onPeers(ch=>{try{reactPeers(ch)}catch(e){}if(isHost){remapPeers();if(S&&ch.joined.length)broadcast()}render()});
   groom.on('state',m=>{if(m.sameTab||isHost)return;const d=m.data;if(!d||typeof d!=='object'||!Array.isArray(d.players))return;
     if(!S||d.gid!==S.gid||d.v>S.v){S=d;render()}});
-  groom.on('act',m=>{if(!isHost||!S||m.sameTab)return;const p=S.players.findIndex(x=>x.peer===m.peer);if(p>=0&&m.data&&typeof m.data.a==='string')doAct(p,m.data)});
+  groom.on('act',m=>{if(!isHost||!S||m.sameTab)return;const p=S.players.findIndex(x=>x.peer===m.peer);if(p>=0&&m.data&&typeof m.data.a==='string'){if(UI.afkMark)delete UI.afkMark[p];doAct(p,m.data)}});
   if(host)setInterval(()=>broadcast(),5000);
   mode='online';return true;
 }
 
+/* ================= Bots : un joueur artificiel qui suit les règles et joue « comme un pote » ================= */
+const BOTN=['Gaston','Josette','Marcel','Simone','Lucien','Paulette','Raymond','Odette'];
+const BOT=(()=>{
+  const ok=(S,k,a)=>!apply(clone(S),k,a);
+  const owner=(S,i)=>S.own[i]?S.own[i][0]:-1;
+  const freeCount=S=>S.own.filter((w,i)=>!w&&buyable(i)).length;
+  // ce qu'il faut garder en caisse : plus le plateau est construit, plus il faut de marge
+  function reserve(S,k){let worst=0;S.own.forEach((w,i)=>{if(w&&w[0]!==k&&!w[2])worst=Math.max(worst,rentOf(S,i,{})||0)});
+    const early=freeCount(S)>14;return Math.min(650,(early?60:140)+worst*.45)}
+  // valeur d'une case pour le joueur k s'il l'obtenait
+  function valueFor(S,k,i){const s=SQ[i];let v=s.p;
+    if(s.t==='st'){const G=GSQ[s.g],mine=G.filter(x=>x!==i&&owner(S,x)===k).length,rest=G.length-1;
+      if(mine===rest)v*=2.3;else if(mine>0)v*=1.35;
+      const others=G.filter(x=>x!==i).map(x=>owner(S,x));if(others.length&&others.every(o=>o>=0&&o!==k&&o===others[0]))v*=1.6}
+    else if(s.t==='gr'){const n=GARES.filter(x=>x!==i&&owner(S,x)===k).length;v*=1+.3*n}
+    else if(s.t==='ut'){v*=UTILS.some(x=>x!==i&&owner(S,x)===k)?1.25:.85}
+    return v}
+  // valeur d'une case que k possède déjà (ce qu'il perd en la cédant)
+  function valueOwn(S,k,i){const s=SQ[i],w=S.own[i];let v=w&&w[2]?s.p*.55:s.p;
+    if(s.t==='st'){if(ownsAll(S,s.g,k))v*=2.6;else if(GSQ[s.g].some(x=>x!==i&&owner(S,x)===k))v*=1.3}
+    else if(s.t==='gr')v*=1+.3*(GARES.filter(x=>owner(S,x)===k).length-1);
+    return v}
+  const completes=(S,to,ps)=>ps.some(i=>{const s=SQ[i];if(s.t!=='st')return false;return GSQ[s.g].every(x=>x===i||ps.includes(x)||owner(S,x)===to)});
+
+  function debt(S,k){
+    // 1) revendre des bâtiments (les moins rentables d'abord)
+    const built=S.own.map((w,i)=>w&&w[0]===k&&w[1]>0?i:-1).filter(i=>i>=0).sort((a,b)=>HC[SQ[a].g]-HC[SQ[b].g]||S.own[b][1]-S.own[a][1]);
+    for(const i of built)if(ok(S,k,{a:'sell',sq:i}))return{a:'sell',sq:i};
+    // 2) hypothéquer : d'abord ce qui ne fait pas partie d'une couleur complète, le moins cher d'abord
+    const props=S.own.map((w,i)=>w&&w[0]===k&&!w[2]?i:-1).filter(i=>i>=0).sort((a,b)=>valueOwn(S,k,a)-valueOwn(S,k,b));
+    for(const i of props)if(ok(S,k,{a:'mort',sq:i}))return{a:'mort',sq:i};
+    return{a:'bankrupt'}}
+
+  function answer(S,k){const T=S.trade;
+    const gain=T.gp.reduce((a,i)=>a+valueFor(S,k,i),0)+T.gm+(T.gc||0)*45;
+    let loss=T.rp.reduce((a,i)=>a+valueOwn(S,k,i),0)+T.rm+(T.rc||0)*45;
+    if(completes(S,T.f,T.rp))loss*=2;
+    if(S.players[k].money-T.rm+T.gm-intr(S,T.gp)<0)return{a:'refuse'};
+    return gain>=loss*1.08?{a:'accept'}:{a:'refuse'}}
+
+  function bid(S,k){const A=S.auc,P=S.players[k],lim=Math.min(valueFor(S,k,A.sq)*(A.back?1:.95),P.money-reserve(S,k)*.4);
+    if(A.bid+10>lim)return{a:'pass'};
+    const room=lim-A.bid,step=room>200?50+10*Math.floor(Math.random()*6):10*(1+Math.floor(Math.random()*Math.min(5,room/10)));
+    return{a:'bid',amt:Math.min(Math.floor(lim/10)*10,A.bid+step)}}
+
+  function buy(S,k){const P=S.players[k],i=S.pend,pr=SQ[i].p,v=valueFor(S,k,i);
+    if(P.money<pr)return{a:'decline'};
+    if(v>pr*1.5||P.money-pr>=reserve(S,k)*.6)return{a:'buy'};
+    return{a:'decline'}}
+
+  function manage(S,k,mem){const P=S.players[k],res=reserve(S,k);
+    // lever une hypothèque sur une couleur complète en priorité
+    const morts=S.own.map((w,i)=>w&&w[0]===k&&w[2]?i:-1).filter(i=>i>=0).sort((a,b)=>valueOwn(S,k,b)-valueOwn(S,k,a));
+    for(const i of morts){const c=Math.round(SQ[i].p/2*1.1);if(P.money-c>=res+80&&ok(S,k,{a:'unmort',sq:i}))return{a:'unmort',sq:i}}
+    // construire : couleur la plus rentable d'abord, toujours en gardant la réserve
+    const gs=[...new Set(S.own.map((w,i)=>w&&w[0]===k&&SQ[i].t==='st'?SQ[i].g:-1).filter(g=>g>=0&&ownsAll(S,g,k)))].sort((a,b)=>b-a);
+    for(const g of gs){if(P.money-HC[g]<res)continue;const G=GSQ[g].slice().sort((a,b)=>S.own[a][1]-S.own[b][1]||SQ[b].p-SQ[a].p);
+      for(const i of G)if(ok(S,k,{a:'build',sq:i}))return{a:'build',sq:i}}
+    // proposer un échange de temps en temps pour finir une couleur
+    if(mem&&!S.trade&&(mem[k]||0)+4<=(S.rnd||1)){mem[k]=S.rnd||1;
+      for(let g=0;g<8;g++){const G=GSQ[g],mine=G.filter(x=>owner(S,x)===k);if(mine.length!==G.length-1)continue;
+        const i=G.find(x=>owner(S,x)!==k),o=owner(S,i);if(o<0||S.players[o].out||!tradeable(S,o,i)||(mem['p'+k+'_'+i]||-99)+8>(S.rnd||1))continue;
+        const offer=Math.round(SQ[i].p*(S.own[i][2]?1.9:2.5)/10)*10;mem['p'+k+'_'+i]=S.rnd||1;if(P.money-offer>=res&&ok(S,k,{a:'propose',to:o,gp:[],rp:[i],gm:offer,rm:0}))return{a:'propose',to:o,gp:[],rp:[i],gm:offer,rm:0}}}
+    return{a:'end'}}
+
+  function roll(S,k){const P=S.players[k];
+    if(P.inJail){const early=freeCount(S)>10;
+      if(P.goj&&early)return{a:'usecard'};
+      if(early&&P.money>350&&ok(S,k,{a:'payjail'}))return{a:'payjail'}}
+    return{a:'roll'}}
+
+  // ce que le joueur k doit décider maintenant (ou null)
+  function pending(S){const out=[];if(S.phase!=='play')return out;
+    S.players.forEach((P,k)=>{if(!P.out&&P.money<0)out.push([k,'debt'])});
+    if(S.trade)out.push([S.trade.t,'trade']);
+    if(S.stage==='auction'&&S.auc)out.push([S.auc.ord[S.auc.i],'auction']);
+    else if(['roll','buy','done'].includes(S.stage))out.push([S.turn,S.stage]);
+    return out}
+  function decide(S,k,kind,{lite=false,mem=null}={}){
+    if(kind==='debt')return debt(S,k);
+    if(kind==='trade')return lite?{a:'refuse'}:answer(S,k);
+    if(kind==='auction')return lite?{a:'pass'}:bid(S,k);
+    if(kind==='roll')return S.players[k].money<0?null:lite?{a:'roll'}:roll(S,k);
+    if(kind==='buy')return buy(S,k);
+    if(kind==='done')return S.players[k].money<0?null:lite?{a:'end'}:manage(S,k,mem);
+    return null}
+  return{pending,decide,valueFor}
+})();
 /* ================= Icônes maison (un seul trait : 24×24, contour 2,4, bouts ronds) ================= */
 const ICP={
+  robot:'<rect x="4.5" y="8" width="15" height="11" rx="3"/><path d="M12 4.5V8M9 13v.5M15 13v.5M9.5 16.2h5M2.5 12.5v3M21.5 12.5v3"/><circle cx="12" cy="3.6" r="1.1"/>',brush:'<path d="M14.5 5.5l4 4M4 20l1.2-4.6L15.6 5a2.1 2.1 0 0 1 3 0l.4.4a2.1 2.1 0 0 1 0 3L8.6 18.8z"/>',
   close:'<path d="M6 6l12 12M18 6L6 18"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   chevL:'<path d="M15 5l-7 7 7 7"/>',chevR:'<path d="M9 5l7 7-7 7"/>',arrowR:'<path d="M5 12h14M13 6l6 6-6 6"/>',swap:'<path d="M4 8h14l-4-4M20 16H6l4 4"/>',
   house:'<path d="M4 11l8-6.5 8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1z"/>',list:'<path d="M5 6h14M5 12h14M5 18h9"/>',
@@ -1260,11 +1414,11 @@ const RULES=[
  {t:'Achète les rues',c:'#2BC46B',i:'<svg viewBox="0 0 96 96"><path d="M14 46L48 18l34 28v36H14z" fill="#fff" stroke="#14213D" stroke-width="4"/><rect x="40" y="58" width="16" height="24" fill="#2BC46B"/><circle cx="72" cy="24" r="14" fill="#FFC531" stroke="#14213D" stroke-width="4"/><text x="72" y="30" font-size="16" text-anchor="middle" font-weight="900" font-family="sans-serif" fill="#14213D">€</text></svg>',
   p:'Tu tombes sur une rue, une gare ou une compagnie libre ? <b>Achète-la</b>, ou laisse partir aux <b>enchères</b> : tout le monde peut miser, le plus offrant l’emporte.'},
  {t:'Construis',c:'#F2463A',i:'<svg viewBox="0 0 96 96"><path d="M8 54l14-12 14 12v24H8z" fill="#2BC46B" stroke="#14213D" stroke-width="4"/><path d="M34 54l14-12 14 12v24H34z" fill="#2BC46B" stroke="#14213D" stroke-width="4"/><path d="M58 44l15-14 15 14v34H58z" fill="#F2463A" stroke="#14213D" stroke-width="4"/></svg>',
-  p:'Possède <b>toute une couleur</b> pour doubler les loyers et bâtir des <b>maisons</b>, de façon équilibrée, puis un <b>hôtel</b>. Plus tu construis, plus les loyers explosent.'},
+  p:'Possède <b>toute une couleur</b> pour doubler les loyers et bâtir des <b>maisons</b>, de façon équilibrée, puis un <b>hôtel</b>. Attention : la banque n’a que <b>32 maisons et 12 hôtels</b>, quand il n’y en a plus, personne ne construit.'},
  {t:'Loyers, cartes et prison',c:'#3D8BFD',i:'<svg viewBox="0 0 96 96"><rect x="12" y="16" width="34" height="50" rx="6" fill="#FFA43A" stroke="#14213D" stroke-width="4" transform="rotate(-10 29 41)"/><text x="27" y="52" font-size="30" text-anchor="middle" font-weight="900" font-family="sans-serif" fill="#fff" transform="rotate(-10 29 41)">?</text><rect x="50" y="30" width="36" height="46" rx="5" fill="#fff" stroke="#14213D" stroke-width="4"/><path d="M60 30v46M68 30v46M76 30v46" stroke="#14213D" stroke-width="4"/></svg>',
   p:'Sur la rue d’un autre, tu paies le <b>loyer</b>. Les cases <b>Chance</b> et <b>Caisse commune</b> font tirer une carte. En <b>prison</b> : tente un double, paie 50 € ou utilise une carte.'},
  {t:'Échange et gagne',c:'#8A4FC7',i:'<svg viewBox="0 0 96 96"><path d="M28 14h40v18a20 20 0 0 1-40 0z" fill="#FFC531" stroke="#14213D" stroke-width="4"/><path d="M28 20H16a10 10 0 0 0 12 16M68 20h12a10 10 0 0 1-12 16" fill="none" stroke="#14213D" stroke-width="4"/><rect x="42" y="52" width="12" height="12" fill="#FFC531" stroke="#14213D" stroke-width="4"/><rect x="30" y="64" width="36" height="12" rx="3" fill="#D99200" stroke="#14213D" stroke-width="4"/></svg>',
-  p:'Propose des <b>échanges</b> (rues et argent) pour compléter tes couleurs. Endetté ? Vends ou <b>hypothèque</b>. Le dernier joueur non ruiné gagne, ou le plus riche quand la limite de tours est atteinte.'}];
+  p:'Propose des <b>échanges</b> (rues, argent, cartes prison) pour compléter tes couleurs ; une rue hypothéquée reçue coûte 10 % d’intérêts. Endetté ? Vends ou <b>hypothèque</b>. Ruiné, tes biens vont à ton créancier (ou aux enchères si c’est la banque). Le dernier en lice gagne, ou le plus riche à la limite de tours.'}];
 function openRules(k=0){let el=document.getElementById('rules');if(!el){el=document.createElement('div');el.id='rules';el.className='modal rulesov';document.body.appendChild(el)}
   const R=RULES[k];el.hidden=false;
   el.innerHTML=`<div class="sheet narrow rsheet" role="dialog" aria-modal="true" aria-label="Comment jouer"><div class="sh"><h2>Comment jouer</h2><button class="x" data-rclose="1" aria-label="Fermer">${ico('close')}</button></div>
@@ -1312,38 +1466,46 @@ function homeView(){
     return}
   if(mode==='online'&&!S){ // salon d'attente
     const ps=groom?groom.peers().filter(x=>x.presence&&x.presence.n).slice().sort((a,b)=>(a.presence.j||0)-(b.presence.j||0)).slice(0,6):[];
-    // pion et couleur de chacun : le sien, sinon le premier libre
-    const usedT=new Set(),usedC=new Set(),look=ps.map((x,i)=>{let t=x.presence.t;if(!Number.isInteger(t)||usedT.has(t))t=[0,1,2,3,4,5].find(v=>!usedT.has(v)&&!ps.some((y,j)=>j>i&&y.presence.t===v))??i;usedT.add(t);
-      let c=x.presence.c;if(!PCOL.includes(c)||usedC.has(c))c=PCOL.find(v=>!usedC.has(v)&&!ps.some((y,j)=>j>i&&y.presence.c===v))||PCOL[i];usedC.add(c);return{t,c}});
+    const hostP=ps.find(x=>x.presence.h),bots=(isHost?(homeView.bots||[]):(hostP&&Array.isArray(hostP.presence.bots)?hostP.presence.bots:[])).slice(0,Math.max(0,6-ps.length));
+    // pion et couleur de chacun : le sien s'il est libre, sinon le premier libre ; les bots prennent ce qui reste
+    const ents=[...ps.map(x=>({x,t:x.presence.t,c:x.presence.c})),...bots.map(b=>({b,t:null,c:null}))];
+    const usedT=new Set(),usedC=new Set(),look=ents.map((e,i)=>{let t=e.t;if(!Number.isInteger(t)||usedT.has(t))t=[0,1,2,3,4,5].find(v=>!usedT.has(v)&&!ents.some((y,j)=>j>i&&y.t===v))??i;usedT.add(t);
+      let c=e.c;if(!PCOL.includes(c)||usedC.has(c))c=PCOL.find(v=>!usedC.has(v)&&!ents.some((y,j)=>j>i&&y.c===v))||PCOL[i];usedC.add(c);return{t,c}});
     homeView.look=look;
-    const meI=ps.findIndex(x=>x.isMe&&x.sameTab),me=ps[meI],hostP=ps.find(x=>x.presence.h),o=Object.assign({},OPTDEF,(isHost?getOpt():hostP&&hostP.presence.o)||{});
-    const allReady=ps.length>=2&&ps.every(x=>x.presence.h||x.presence.r);
+    const meI=ps.findIndex(x=>x.isMe&&x.sameTab),me=ps[meI],o=Object.assign({},OPTDEF,(isHost?getOpt():hostP&&hostP.presence.o)||{});
+    const total=ents.length,allReady=total>=2&&ps.every(x=>x.presence.h||x.presence.r);
     H.innerHTML=deco+`<div class="hero"><span class="logo"><small>Salon</small>Le Grand Paris</span></div>
     <section class="card"><h2><span class="n">1</span>Invite tes potes</h2>
       <div class="row" style="justify-content:center"><span class="code">${esc(code)}</span></div>
       <div class="row" style="justify-content:center"><button class="gb blue sm" id="invite" type="button">${ico('link')}Copier l’invitation</button><button class="gb white sm" id="copy" type="button">${ico('copy')}Copier le code</button></div>
       <p class="note">${SITE?'Copie l’invitation et envoie-la sur Discord : tes potes cliquent sur le lien, se connectent avec Discord, appuient sur Rejoindre et apparaissent ici.':'Envoie-leur le lien de cette page et le code : ils mettent leur pseudo, tapent le code et apparaissent ici.'}</p></section>
-    <section class="card"><h2><span class="n">2</span>Joueurs ${ps.length}/6</h2>
-      ${me?'<p class="note">Clique sur ton rond pour mettre ta photo, sur le petit pion pour changer de figurine, sur la pastille pour la couleur.</p>'+PFP_HINT:''}
-      <div class="slots">${[...Array(6)].map((_,i)=>{const x=ps[i];if(!x)return `<div class="slot empty">${i===ps.length?'En attente…':'Libre'}</div>`;const L=look[i],mine=x.isMe&&x.sameTab;
-        return `<div class="slot${mine?' mine':''}" style="--pc:${L.c}">${mine?`<button class="avb" data-lpic="1" aria-label="Changer ma photo">${avatar(L.c,L.t,'s',myImg())}</button><button class="tokb" data-ltok="1" aria-label="Changer de pion" title="Changer de pion">${ICON[TOKS[L.t]]}</button>`:avatar(L.c,L.t,'s',okImg(x.presence.img)?x.presence.img:profImg(x.by))}<span class="nm">${esc(x.presence.n)}<small>${x.presence.h?'hôte':mine?'toi':TOKS[L.t]}</small></span>
-          ${mine?`<button class="cdot" data-lcol="1" style="--dc:${L.c}" aria-label="Changer de couleur"></button>`:''}<span class="rdy${x.presence.h||x.presence.r?' ok':''}">${x.presence.h||x.presence.r?ico('check')+'Prêt':'…'}</span></div>`}).join('')}</div>
+    <section class="card"><h2><span class="n">2</span>Joueurs ${total}/6</h2>
+      ${me?'<p class="note">Clique sur ton rond pour mettre ta photo, et sur <b>Pion</b> pour choisir ta figurine et ta couleur.</p>'+PFP_HINT:''}
+      <div class="slots">${[...Array(6)].map((_,i)=>{const e=ents[i];if(!e)return `<div class="slot empty">${i===total?'En attente…':'Libre'}</div>`;const L=look[i];
+        if(e.b)return `<div class="slot bot" style="--pc:${L.c}"><span class="av s botav" style="--pc:${L.c}">${ico('robot')}</span><span class="nm">${esc(e.b.n)}<small>bot · ${TOKS[L.t]}</small></span>${isHost?`<button class="x" data-rmbot="${i-ps.length}" aria-label="Retirer ce bot">${ico('close')}</button>`:'<span class="rdy ok">'+ico('check')+'Prêt</span>'}</div>`;
+        const x=e.x,mine=x.isMe&&x.sameTab;
+        return `<div class="slot${mine?' mine':''}" style="--pc:${L.c}">${mine?`<button class="avb" data-lpic="1" aria-label="Changer ma photo">${avatar(L.c,L.t,'s',myImg())}</button>`:avatar(L.c,L.t,'s',okImg(x.presence.img)?x.presence.img:profImg(x.by))}<span class="nm">${esc(x.presence.n)}<small>${x.presence.h?'hôte':mine?'toi':TOKS[L.t]}</small></span>
+          ${mine?lookBtn('data-llook="1"',L.t,L.c):''}<span class="rdy${x.presence.h||x.presence.r?' ok':''}">${x.presence.h||x.presence.r?ico('check')+'Prêt':'…'}</span></div>`}).join('')}</div>
+      ${isHost&&total<6?`<div class="row" style="justify-content:center"><button class="gb white sm" id="addbot" type="button">${ico('robot')}Ajouter un bot</button></div>`:''}
       ${me&&!isHost?`<button class="gb ${me.presence.r?'white':'green'} xl" id="ready">${me.presence.r?'Pas encore prêt':'Je suis prêt !'}</button>`:''}
-      ${isHost?`<button class="gb green xl" id="start" ${allReady?'':'disabled'}>Lancer la partie</button><p class="note" style="text-align:center">${ps.length<2?'Il faut au moins 2 joueurs.':allReady?'Tout le monde est prêt !':'On attend que tout le monde soit prêt.'}</p>`:'<p class="note" style="text-align:center">L’hôte lance la partie quand tout le monde est prêt.</p>'}
+      ${isHost?`<button class="gb green xl" id="start" ${allReady?'':'disabled'}>Lancer la partie</button><p class="note" style="text-align:center">${total<2?'Il faut au moins 2 joueurs : invite un pote ou ajoute un bot.':allReady?'Tout le monde est prêt !':'On attend que tout le monde soit prêt.'}</p>`:'<p class="note" style="text-align:center">L’hôte lance la partie quand tout le monde est prêt.</p>'}
       <div class="row" style="justify-content:center"><button class="gb white sm" id="leave" type="button">${ico('exit')}Quitter le salon</button>${rulesBtn}</div></section>
     <section class="card"><h2><span class="n">3</span>Options ${isHost?'':'<small class="note">(choisies par l’hôte)</small>'}</h2>${optsHTML(o,isHost)}</section>`;
     const st=document.getElementById('start');
-    if(st)st.onclick=()=>{const L=groom.peers().filter(x=>x.presence&&x.presence.n).sort((a,b)=>(a.presence.j||0)-(b.presence.j||0)).slice(0,6);
-      S=newGame(L.map((x,i)=>({n:String(x.presence.n).slice(0,16),peer:x.peer,t:homeView.look[i]?.t,c:homeView.look[i]?.c})),getOpt());save();broadcast();render()};
+    if(st)st.onclick=()=>{
+      S=newGame(ents.map((e,i)=>e.b?{n:String(e.b.n).slice(0,16),bot:1,t:look[i].t,c:look[i].c}:{n:String(e.x.presence.n).slice(0,16),peer:e.x.peer,t:look[i].t,c:look[i].c}),getOpt());save();broadcast();render()};
+    const pubBots=()=>{groom.presence({bots:homeView.bots||[]}).catch(()=>{});homeView()};
+    {const ab=document.getElementById('addbot');if(ab)ab.onclick=()=>{const B=homeView.bots=homeView.bots||[];const n=BOTN.find(x=>!B.some(b=>b.n===x)&&!ps.some(p=>p.presence.n===x))||'Bot';B.push({n});pubBots()}}
+    H.querySelectorAll('[data-rmbot]').forEach(b=>b.onclick=()=>{(homeView.bots||[]).splice(+b.dataset.rmbot,1);pubBots()});
     document.getElementById('copy').onclick=()=>{try{navigator.clipboard.writeText(code).then(()=>toast('Code copié !'),()=>toast('Code : '+code))}catch(e){toast('Code : '+code)}};
     document.getElementById('invite').onclick=()=>{const t=SITE?`Viens jouer au Grand Paris avec moi ! ${inviteLink(code)}`:`Viens jouer au Grand Paris avec moi ! Ouvre le jeu avec le lien que je t’envoie, mets ton pseudo et tape le code ${code}.`;try{navigator.clipboard.writeText(t).then(()=>toast('Invitation copiée : colle-la à tes potes avec le lien du jeu.'),()=>toast(t))}catch(e){toast(t)}};
-    document.getElementById('leave').onclick=()=>{if(groom)groom.leave().catch(()=>{});groom=null;mode=null;isHost=false;render()};
+    document.getElementById('leave').onclick=()=>{if(groom)groom.leave().catch(()=>{});groom=null;mode=null;isHost=false;homeView.bots=[];render()};
     const rd=document.getElementById('ready');if(rd)rd.onclick=()=>{groom.presence({r:me.presence.r?0:1}).catch(()=>{})};
     const setLook=(t,c)=>{const pref={t,c};LS.set('lgp-me',pref);groom.presence(pref).catch(()=>{})};
     PASTE.to=d=>{LS.set('lgp-pfp',d);groom.presence({img:d}).catch(()=>toast('Photo trop lourde pour le salon.'));homeView()};
     H.querySelectorAll('[data-lpic]').forEach(b=>b.onclick=()=>pickPhoto(PASTE.to));
-    H.querySelectorAll('[data-ltok]').forEach(b=>b.onclick=()=>{const L=look[meI],used=look.filter((_,j)=>j!==meI).map(l=>l.t);let t=L.t;for(let k=0;k<6;k++){t=(t+1)%6;if(!used.includes(t))break}setLook(t,L.c)});
-    H.querySelectorAll('[data-lcol]').forEach(b=>b.onclick=()=>{const L=look[meI],used=look.filter((_,j)=>j!==meI).map(l=>l.c);let k=PCOL.indexOf(L.c);for(let n=0;n<PCOL.length;n++){k=(k+1)%PCOL.length;if(!used.includes(PCOL[k]))break}setLook(L.t,PCOL[k])});
+    H.querySelectorAll('[data-llook]').forEach(b=>b.onclick=()=>{const L=look[meI],tT={},tC={};ps.forEach((x,j)=>{if(j!==meI){tT[look[j].t]=x.presence.n;tC[look[j].c]=x.presence.n}});
+      openLook({t:L.t,c:L.c,takenT:tT,takenC:tC,title:'Ton pion',onPick:setLook})});
     H.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{const[k,v]=parseOpt(b.dataset.opt);const o2=Object.assign(getOpt(),{[k]:v});LS.set('lgp-opt',o2);groom.presence({o:o2}).catch(()=>{});homeView()});
     H.querySelectorAll('[data-rules]').forEach(b=>b.onclick=()=>openRules(0));
     return;
@@ -1352,25 +1514,27 @@ function homeView(){
     const pl=homeView.local||(homeView.local=[{n:myName||'Joueur 1',t:0,c:PCOL[0]},{n:'Joueur 2',t:1,c:PCOL[1]}]),o=getOpt();
     H.innerHTML=deco+`<div class="hero"><span class="logo"><small>Sur ce PC</small>Le Grand Paris</span></div>
     <section class="card"><h2><span class="n">${pl.length}</span>Qui joue ?</h2>
-      <p class="note">Clique sur un rond pour mettre une photo, sur le petit pion pour changer de figurine, sur la pastille pour la couleur.</p>${PFP_HINT.replace('ici','sur la ligne du joueur (clique-la d’abord)')}
-      <div class="pslots">${pl.map((x,i)=>`<div class="slot${PASTE.slot===i?' pasting':''}" data-slot="${i}" style="--pc:${x.c}"><button class="avb" data-pic="${i}" aria-label="Photo de ${esc(x.n)}">${avatar(x.c,x.t,'m',x.img)}</button><button class="tokb" data-tok="${i}" aria-label="Changer le pion de ${esc(x.n)}" title="Changer de pion">${ICON[TOKS[x.t]]}</button><input type="text" id="ln${i}" maxlength="16" value="${esc(x.n)}" aria-label="Nom du joueur ${i+1}"><button class="cdot" data-col="${i}" style="--dc:${x.c}" aria-label="Changer de couleur"></button>${pl.length>2?`<button class="x" data-rm="${i}" aria-label="Retirer">${ico('close')}</button>`:''}</div>`).join('')}
-        ${pl.length<6?`<button class="slot empty" id="addp" type="button" style="justify-content:center">+ Ajouter un joueur</button>`:''}</div></section>
+      <p class="note">Clique sur un rond pour mettre une photo, et sur <b>Pion</b> pour choisir la figurine et la couleur. Il manque des joueurs ? Ajoute des bots.</p>${PFP_HINT.replace('ici','sur la ligne du joueur (clique-la d’abord)')}
+      <div class="pslots">${pl.map((x,i)=>`<div class="slot${x.bot?' bot':''}${PASTE.slot===i&&!x.bot?' pasting':''}" data-slot="${i}" style="--pc:${x.c}">${x.bot?`<span class="av m botav" style="--pc:${x.c}">${ico('robot')}</span>`:`<button class="avb" data-pic="${i}" aria-label="Photo de ${esc(x.n)}">${avatar(x.c,x.t,'m',x.img)}</button>`}<input type="text" id="ln${i}" maxlength="16" value="${esc(x.n)}" aria-label="Nom du joueur ${i+1}">${x.bot?'<span class="botc">BOT</span>':''}${lookBtn(`data-look="${i}"`,x.t,x.c)}${pl.length>2?`<button class="x" data-rm="${i}" aria-label="Retirer">${ico('close')}</button>`:''}</div>`).join('')}
+        ${pl.length<6?`<div class="addrow"><button class="slot empty" id="addp" type="button">${ico('plus')}Ajouter un joueur</button><button class="slot empty" id="addb" type="button">${ico('robot')}Ajouter un bot</button></div>`:''}</div></section>
     <section class="card"><h2>Options</h2>${optsHTML(o,true)}</section>
     <section class="card"><button class="gb green xl" id="golocal">C’est parti !</button>
       <div class="row" style="justify-content:center"><button class="gb white sm" id="back">Retour</button>${rulesBtn}</div></section>`;
     pl.forEach((_,i)=>document.getElementById('ln'+i).oninput=e=>pl[i].n=e.target.value);
     H.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{pl.splice(+b.dataset.rm,1);homeView()});
-    PASTE.slot=PASTE.slot??0;if(PASTE.slot>=pl.length)PASTE.slot=0;PASTE.to=d=>{pl[PASTE.slot].img=d;homeView()};
-    H.querySelectorAll('[data-slot]').forEach(b=>b.addEventListener('pointerdown',()=>{PASTE.slot=+b.dataset.slot;H.querySelectorAll('[data-slot]').forEach(z=>z.classList.toggle('pasting',z===b))}));
+    PASTE.slot=PASTE.slot??0;if(PASTE.slot>=pl.length||pl[PASTE.slot].bot)PASTE.slot=pl.findIndex(x=>!x.bot);PASTE.to=d=>{if(pl[PASTE.slot]&&!pl[PASTE.slot].bot){pl[PASTE.slot].img=d;homeView()}};
+    H.querySelectorAll('[data-slot]').forEach(b=>b.addEventListener('pointerdown',()=>{if(pl[+b.dataset.slot].bot)return;PASTE.slot=+b.dataset.slot;H.querySelectorAll('[data-slot]').forEach(z=>z.classList.toggle('pasting',z===b))}));
     H.querySelectorAll('[data-pic]').forEach(b=>b.onclick=()=>{const i=+b.dataset.pic;pickPhoto(d=>{pl[i].img=d;homeView()})});
-    H.querySelectorAll('[data-tok]').forEach(b=>b.onclick=()=>{const i=+b.dataset.tok,used=pl.filter((_,j)=>j!==i).map(x=>x.t);let t=pl[i].t;for(let k=0;k<6;k++){t=(t+1)%6;if(!used.includes(t))break}pl[i].t=t;homeView()});
-    H.querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{const i=+b.dataset.col,used=pl.filter((_,j)=>j!==i).map(x=>x.c);let k=PCOL.indexOf(pl[i].c);for(let n=0;n<PCOL.length;n++){k=(k+1)%PCOL.length;if(!used.includes(PCOL[k]))break}pl[i].c=PCOL[k];homeView()});
+    H.querySelectorAll('[data-look]').forEach(b=>b.onclick=()=>{const i=+b.dataset.look,tT={},tC={};pl.forEach((x,j)=>{if(j!==i){tT[x.t]=x.n||'un autre';tC[x.c]=x.n||'un autre'}});
+      openLook({t:pl[i].t,c:pl[i].c,takenT:tT,takenC:tC,title:pl[i].bot?`Pion de ${pl[i].n} (bot)`:`Pion de ${pl[i].n||'ce joueur'}`,onPick:(t,c)=>{pl[i].t=t;pl[i].c=c;homeView()}})});
     H.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{const[k,v]=parseOpt(b.dataset.opt);LS.set('lgp-opt',Object.assign(getOpt(),{[k]:v}));homeView()});
     H.querySelectorAll('[data-rules]').forEach(b=>b.onclick=()=>openRules(0));
-    const ad=document.getElementById('addp');if(ad)ad.onclick=()=>{const t=[0,1,2,3,4,5].find(v=>!pl.some(x=>x.t===v)),c=PCOL.find(v=>!pl.some(x=>x.c===v));pl.push({n:'Joueur '+(pl.length+1),t,c});homeView()};
+    const free=()=>({t:[0,1,2,3,4,5].find(v=>!pl.some(x=>x.t===v)),c:PCOL.find(v=>!pl.some(x=>x.c===v))});
+    const ad=document.getElementById('addp');if(ad)ad.onclick=()=>{pl.push({n:'Joueur '+(pl.filter(x=>!x.bot).length+1),...free()});homeView()};
+    const abt=document.getElementById('addb');if(abt)abt.onclick=()=>{pl.push({n:BOTN.find(x=>!pl.some(p=>p.n===x))||'Bot',bot:1,...free()});homeView()};
     document.getElementById('back').onclick=()=>{mode=null;homeView()};
-    document.getElementById('golocal').onclick=()=>{const L=pl.map(x=>({n:x.n.trim().slice(0,16),t:x.t,c:x.c,img:x.img})).filter(x=>x.n);if(L.length<2)return toast('Il faut au moins 2 joueurs.');
-      mode='local';S=newGame(L,getOpt());S.players.forEach((P,k)=>{if(okImg(L[k].img))P.img=L[k].img});PASTE.to=null;save();render()};
+    document.getElementById('golocal').onclick=()=>{const L=pl.map(x=>({n:x.n.trim().slice(0,16),t:x.t,c:x.c,img:x.img,bot:x.bot})).filter(x=>x.n);if(L.length<2)return toast('Il faut au moins 2 joueurs.');if(!L.some(x=>!x.bot))return toast('Il faut au moins un joueur humain.');
+      mode='local';S=newGame(L,getOpt());S.players.forEach((P,k)=>{if(!P.bot&&okImg(L[k].img))P.img=L[k].img});PASTE.to=null;save();render()};
     return;
   }
   const pref=LS.get('lgp-me')||{},myT=Number.isInteger(pref.t)?pref.t:0,myC=pref.c||PCOL[0];
@@ -1379,7 +1543,7 @@ function homeView(){
   H.innerHTML=deco+`<div class="hero"><span class="logo mlogo"><small>Jeu de propriétés</small>Le Grand Paris</span></div>
   <section class="card mainmenu">
     ${SITE?discordBlock():''}
-    <div class="pseudo"><button class="avb" id="mypic" aria-label="Changer ma photo de profil">${avatar(myC,myT,'m',myImg())}</button><button class="tokb" id="mytok" aria-label="Changer de pion" title="Changer de pion">${ICON[TOKS[myT]]}</button><input type="text" id="pseudo" maxlength="16" value="${esc(myName)}" placeholder="Ton pseudo" aria-label="Ton pseudo"><button class="cdot" id="mycol" style="--dc:${myC}" aria-label="Changer de couleur"></button></div>
+    <div class="pseudo"><button class="avb" id="mypic" aria-label="Changer ma photo de profil">${avatar(myC,myT,'m',myImg())}</button><input type="text" id="pseudo" maxlength="16" value="${esc(myName)}" placeholder="Ton pseudo" aria-label="Ton pseudo">${lookBtn('id="mylook"',myT,myC)}</div>
     ${myPfp()?`<div class="row pfprow"><span class="note">Ta photo perso est prête.</span><button class="gb white xs" id="rmpic">${ico('close')}${SITE&&DISCORD.me?'Revenir à ma photo Discord':AUTO.me?'Revenir à ma photo claude.ai':'Retirer'}</button></div>`:SITE&&DISCORD.me?'':SITE?'':AUTO.me?`<p class="note pfphint">Ta photo de profil claude.ai est utilisée automatiquement. Pour une autre (ta pdp Discord par ex.), fais <b>Ctrl+V</b> ici ou clique sur le rond.</p>`:PFP_HINT}
     ${savedLocal&&savedLocal.phase==='play'?`<button class="gb blue" id="lresume">${ico('play')}Reprendre la partie locale</button>`:''}
     ${online&&savedHost?`<button class="gb blue" id="resume">${ico('play')}Reprendre le salon ${esc(savedHost.code)}</button>`:''}
@@ -1397,8 +1561,7 @@ function homeView(){
   const setMine=d=>{LS.set('lgp-pfp',d);homeView()};PASTE.to=setMine;
   document.getElementById('mypic').onclick=()=>pickPhoto(setMine);
   {const rm=document.getElementById('rmpic');if(rm)rm.onclick=()=>{LS.del('lgp-pfp');homeView()}}
-  document.getElementById('mytok').onclick=()=>{LS.set('lgp-me',{t:(myT+1)%6,c:myC});homeView()};
-  document.getElementById('mycol').onclick=()=>{LS.set('lgp-me',{t:myT,c:PCOL[(PCOL.indexOf(myC)+1)%PCOL.length]});homeView()};
+  document.getElementById('mylook').onclick=()=>openLook({t:myT,c:myC,title:'Ton pion préféré',onPick:(t,c)=>{LS.set('lgp-me',{t,c});homeView()}});
   H.querySelectorAll('[data-rules]').forEach(b=>b.onclick=()=>openRules(0));
   const need=()=>{if(!myName){toast('Choisis un pseudo d’abord.');ps.focus();return false}return true};
   {const a=document.getElementById('dlogin');if(a)a.onclick=()=>DISCORD.login();const o=document.getElementById('dlogout');if(o)o.onclick=()=>DISCORD.logout()}
@@ -2712,6 +2875,47 @@ function deedHTML(i){
 function boardGlow(tiles,color,alpha=.8){if(!G||G.fail||!G.glows)return;G.glowOn=!!(tiles&&tiles.length);G.glowA=alpha;const c=new THREE.Color(color||'#FFD23F');
   G.glows.forEach((m,j)=>{const i=tiles?tiles[j]:null;if(i==null){m.visible=false;return}const F=tileFrame(i),R=rectOf(i);m.position.set(F.C.x,BY+.024,F.C.z);m.scale.set((R.x1-R.x0)/TEX*10,(R.y1-R.y0)/TEX*10,1);m.material.color.copy(c);m.visible=true})}
 function boardFocus(i){if(!G||G.fail)return;G.focus=i==null?null:i}
+/* ================= Choix du pion et de la couleur ================= */
+const TOKN=['Le Béret','Le Croissant','Le Pigeon','La Trottinette','Le Macaron','La Baguette'];
+const TOKD=['Chic, toujours de travers','Croustillant dès le matin','Le vrai roi des places','Toujours en retard, toujours pressée','Fragile mais plein de couleurs','La tradition avant tout'];
+// photo studio des vrais pions 3D (rendue une fois, puis gardée)
+const SHOT={};
+function pawnShot(t,c){const key=t+c;if(SHOT[key])return SHOT[key];if(!(typeof G!=='undefined'&&G&&!G.fail&&G.renderer&&built===true))return null;
+  try{const R=G.renderer,W=320;
+    if(!pawnShot.st){const sc=new THREE.Scene();sc.environment=G.env;const cam=new THREE.PerspectiveCamera(30,1,.05,20);cam.position.set(0,.42,.98);cam.lookAt(0,.17,0);
+      const k1=new THREE.DirectionalLight(0xFFF6E8,.9);k1.position.set(1.2,2,1.6);sc.add(k1);sc.add(new THREE.HemisphereLight(0xFFFFFF,0x6A5A46,.25));const k2=new THREE.DirectionalLight(0xFFE2B8,.55);k2.position.set(-1.6,1.1,-1.2);sc.add(k2);
+      const rt=new THREE.WebGLRenderTarget(W,W);rt.texture.encoding=THREE.sRGBEncoding;pawnShot.st={sc,cam,rt,buf:new Uint8Array(W*W*4)}}
+    const{sc,cam,rt,buf}=pawnShot.st,g=makePawn(c,t);G.scene.remove(g);g.rotation.y=-.55;g.traverse(o=>{if(o.isMesh&&o.material&&o.material.map===G.blob)o.visible=false});sc.add(g);
+    const cc=new THREE.Color();R.getClearColor(cc);const ca=R.getClearAlpha();
+    const ex=R.toneMappingExposure;R.toneMappingExposure=.52;R.setRenderTarget(rt);R.setClearColor(0x000000,0);R.clear();R.render(sc,cam);R.readRenderTargetPixels(rt,0,0,W,W,buf);R.setRenderTarget(null);R.setClearColor(cc,ca);R.toneMappingExposure=ex;
+    sc.remove(g);g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material&&o.material!==G.blob)o.material.dispose()});
+    const big=document.createElement('canvas');big.width=big.height=W;const bx=big.getContext('2d'),id=bx.createImageData(W,W);
+    for(let y=0;y<W;y++)id.data.set(buf.subarray((W-1-y)*W*4,(W-y)*W*4),y*W*4);bx.putImageData(id,0,0);
+    const sm=document.createElement('canvas');sm.width=sm.height=160;const sx=sm.getContext('2d');sx.imageSmoothingQuality='high';sx.drawImage(big,0,0,160,160);
+    return SHOT[key]=sm.toDataURL('image/png')}catch(e){console.warn(e);return null}}
+const pawnImg=(t,c,cls='')=>{const u=pawnShot(t,c);return u?`<img class="pwi ${cls}" src="${u}" alt="">`:`<span class="pwi svg ${cls}" style="color:${c}">${ICON[TOKS[t%6]]}</span>`};
+// bouton unique « pion & couleur »
+const lookBtn=(attr,t,c,label='Pion')=>`<button class="lookb" ${attr} style="--pc:${c}" aria-label="Choisir mon pion et ma couleur" title="Choisir le pion et la couleur">${pawnImg(t,c)}<span class="lkl">${ico('brush')}${label}</span></button>`;
+// fenêtre de choix : on voit les vrais pions, ce qui est déjà pris, et l'aperçu en grand
+function openLook({t,c,takenT={},takenC={},title='Ton pion',onPick}){
+  const el=ovl();OVL.kind='look';const cur={t,c};
+  if(takenT[cur.t])cur.t=[0,1,2,3,4,5].find(k=>!takenT[k])??cur.t;if(takenC[cur.c])cur.c=PCOL.find(x=>!takenC[x])||cur.c;
+  const draw=()=>{el.innerHTML=`<div class="sheet look" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="sh"><h2>${ico('brush','h')}${esc(title)}</h2><button class="x" data-lk="close" aria-label="Fermer">${ico('close')}</button></div><div class="sb">
+    <div class="lkhero" style="--pc:${cur.c}"><div class="lkstage">${pawnImg(cur.t,cur.c,'big')}</div><div class="lkinfo"><b>${TOKN[cur.t]}</b><small>${TOKD[cur.t]}</small><span class="lkchip">${ico('check')}Ta couleur</span></div></div>
+    <h3 class="lkh">Figurine</h3>
+    <div class="lkgrid">${[0,1,2,3,4,5].map(k=>{const tk=takenT[k];return `<button class="lkt" data-lt="${k}" aria-pressed="${k===cur.t}" ${tk?'disabled':''} style="--pc:${cur.c}">${pawnImg(k,cur.c)}<b>${TOKN[k].replace(/^(Le|La) /,'')}</b>${tk?`<em>pris par ${esc(tk)}</em>`:''}</button>`}).join('')}</div>
+    <h3 class="lkh">Couleur</h3>
+    <div class="lkcols">${PCOL.map(x=>{const tk=takenC[x];return `<button class="lkc" data-lc="${x}" style="--dc:${x}" aria-pressed="${x===cur.c}" ${tk?'disabled':''} aria-label="${tk?'Prise par '+esc(tk):'Couleur'}" title="${tk?'Prise par '+esc(tk):''}">${x===cur.c?ico('check'):tk?ico('close'):''}</button>`}).join('')}</div>
+    <div class="bt lkbt"><button class="gb white" data-lk="rand">${ico('dice')}Au hasard</button><button class="gb green" data-lk="ok">${ico('check')}C’est lui !</button></div></div></div>`};
+  draw();el.hidden=false;
+  el.onclick=e=>{const b=e.target.closest('[data-lt],[data-lc],[data-lk]');if(!b){if(e.target===el)closeOvl();return}if(b.disabled)return;
+    if(b.dataset.lt!=null){cur.t=+b.dataset.lt;SFX.play('pop');draw();return}
+    if(b.dataset.lc){cur.c=b.dataset.lc;SFX.play('pop');draw();return}
+    const k=b.dataset.lk;SFX.play('click');
+    if(k==='close'){closeOvl();return}
+    if(k==='rand'){const ft=[0,1,2,3,4,5].filter(x=>!takenT[x]),fc=PCOL.filter(x=>!takenC[x]);cur.t=ft[Math.floor(Math.random()*ft.length)]??cur.t;cur.c=fc[Math.floor(Math.random()*fc.length)]||cur.c;draw();return}
+    if(k==='ok'){closeOvl();onPick&&onPick(cur.t,cur.c)}};
+  setTimeout(()=>{const f=el.querySelector('[data-lk="ok"]');if(f)f.focus()},60)}
 /* ================= Menu pause, réglages, fin de partie ================= */
 function ovl(){let el=document.getElementById('ovl');if(!el){el=document.createElement('div');el.id='ovl';el.className='modal ovl';el.hidden=true;document.body.appendChild(el)}return el}
 const OVL={kind:null};
@@ -2773,7 +2977,7 @@ function confetti(dur=6500){const c=document.createElement('canvas');c.className
       if(p.sh==='c'){x.beginPath();x.arc(0,0,p.w*.45,0,7);x.fill()}else{x.scale(1,Math.abs(Math.cos(now/200+p.sw)));x.fillRect(-p.w/2,-p.h/2,p.w,p.h)}x.restore()});
     if(u<1)requestAnimationFrame(step);else c.remove()};requestAnimationFrame(step)}
 /* ---------- rejouer avec les mêmes joueurs ---------- */
-function replay(){if(!S)return;if(mode!=='local'&&!isHost)return;const opt=S.opt,pl=S.players.map(p=>({n:p.n,t:p.t,c:p.c,peer:p.peer,img:p.img}));
+function replay(){if(!S)return;if(mode!=='local'&&!isHost)return;const opt=S.opt,pl=S.players.map(p=>({n:p.n,t:p.t,c:p.c,peer:p.peer,img:p.img,bot:p.bot}));
   if(mode==='online'){const ps=groom?groom.peers():[];pl.forEach(p=>{if(p.peer&&!ps.some(x=>x.peer===p.peer))p.peer=null})}
   S=newGame(pl,opt);if(mode==='local')S.players.forEach((P,k)=>{if(okImg(pl[k].img))P.img=pl[k].img});UI.skipIntro=true;save();broadcast();render();SFX.play('start')}
 
@@ -2885,10 +3089,13 @@ function B(label,p,a,cls='',extra=''){const k=ACTS.push({p,a})-1;return `<button
 function worth(k){const P=S.players[k];if(P.out)return -1e9;let w=P.money;S.own.forEach((o,i)=>{if(!o||o[0]!==k)return;const s=SQ[i];w+=o[2]?s.p/2:s.p;if(s.t==='st')w+=(o[1]||0)*HC[s.g]});return w}
 function ranks(){const ord=S.players.map((P,k)=>k).sort((a,b)=>worth(b)-worth(a)),r={};let prev=null,rk=0;ord.forEach((k,j)=>{const w=worth(k);if(w!==prev){rk=j+1;prev=w}r[k]=rk});return{r,ord}}
 const delayNow=()=>(G&&!G.fail&&G.pawns?pawnDelay():0);
-const isMine=()=>mode==='local'||S.turn===myIdx();
+// qui ce poste contrôle : en local tous les humains, en ligne uniquement soi (les bots sont joués par l'hôte)
+const ctl=k=>k>=0&&!!S&&!!S.players[k]&&(mode==='local'?!S.players[k].bot:k===myIdx());
+const isMine=()=>ctl(S.turn);
+const humans=()=>S.players.map((P,k)=>k).filter(k=>!S.players[k].bot&&!S.players[k].out);
 const pimg=k=>{const P=S.players[k];if(!P)return null;if(okImg(P.img))return P.img;if(mode==='online'){if(P.peer&&P.peer===myPeer())return myImg();return peerImg(P.peer)}return null};
 const pav=(k,cls='')=>avatar(S.players[k].c,S.players[k].t??k,cls,pimg(k));
-const actor=()=>mode==='local'?S.turn:myIdx();
+const actor=()=>mode==='local'?(ctl(S.turn)?S.turn:(UI.lastHum!=null&&ctl(UI.lastHum)&&!S.players[UI.lastHum].out?UI.lastHum:humans()[0]??-1)):myIdx();
 
 /* ---------- argent qui voyage entre les plaques ---------- */
 function plateCenter(k){const el=document.querySelector(`[data-plate="${k}"] .av`),hud=document.querySelector('.hud').getBoundingClientRect();if(!el)return null;const r=el.getBoundingClientRect();return[r.left+r.width/2-hud.left,r.top+r.height/2-hud.top]}
@@ -2917,7 +3124,7 @@ function renderPlates(){
   const sig=S.gid+':'+S.players.length;
   if(UI.plateSig!==sig){UI.plateSig=sig;UI.disp={};UI.tgt={};UI.rank={};
     box.innerHTML=S.players.map((P,k)=>`<div class="plate k${k}" data-plate="${k}" style="--pc:${P.c}" role="button" tabindex="0" aria-label="Voir les propriétés de ${esc(P.n)}"><span class="rank"></span><span class="flag">À toi !</span>${pav(k)}
-      <div class="pi"><div class="pn">${esc(P.n)}</div><div class="pm"><span class="coin"></span><span class="mv"></span></div><div class="pg"></div><div class="bdg"></div></div>${k===me?'<span class="me">TOI</span>':''}</div>`).join('')}
+      <div class="pi"><div class="pn">${esc(P.n)}${P.bot?'<span class="botc">BOT</span>':''}</div><div class="pm"><span class="coin"></span><span class="mv"></span></div><div class="pg"></div><div class="bdg"></div></div>${k===me?'<span class="me">TOI</span>':''}</div>`).join('')}
   const alive=S.players.filter(P=>!P.out),tie=alive.every((P,k)=>r[S.players.indexOf(P)]===1);
   const ch=[];
   S.players.forEach((P,k)=>{const el=box.querySelector(`[data-plate="${k}"]`);if(!el)return;
@@ -2955,7 +3162,7 @@ function mdeed(i,extra){const s=SQ[i];return `<div class="mdeed" data-hsq="${i}"
 const AUCT=15;
 function auctionTimer(A){const key=S.gid+':'+A.sq+':'+A.i+':'+A.bid+':'+A.ord.join('.');
   if(UI.aucKey!==key){UI.aucKey=key;UI.aucT0=performance.now();clearTimeout(UI.aucH);const bw=A.ord[A.i];
-    UI.aucH=setTimeout(()=>{if(!S||UI.aucKey!==key||S.stage!=='auction')return;if(mode==='local'||bw===myIdx()){toast(`${nm(S,bw)} n’a pas répondu : il passe.`);perform(bw,{a:'pass'})}},AUCT*1000);
+    UI.aucH=setTimeout(()=>{if(!S||UI.aucKey!==key||S.stage!=='auction')return;if(ctl(bw)){toast(`${nm(S,bw)} n’a pas répondu : il passe.`);perform(bw,{a:'pass'})}},AUCT*1000);
     clearInterval(UI.aucTick);UI.aucTick=setInterval(()=>{if(UI.aucKey!==key){clearInterval(UI.aucTick);return}const left=AUCT-(performance.now()-UI.aucT0)/1000;if(left<5.2&&left>0)SFX.play('tick')},1000)}
   return (performance.now()-UI.aucT0)/1000}
 function renderDock(){
@@ -2965,22 +3172,22 @@ function renderDock(){
   if(S.phase==='over'){p=''}
   else if(performance.now()<(UI.busy||0)){p=''}
   else{
-    const debt=S.players.map((P,k)=>k).filter(k=>!S.players[k].out&&S.players[k].money<0&&(local||k===me));
+    const debt=S.players.map((P,k)=>k).filter(k=>!S.players[k].out&&S.players[k].money<0&&ctl(k));
     if(debt.length){const k=debt[0],P=S.players[k];
       p=`<div class="prompt warn"><div class="hd">${av(k)}<div><div class="tt">${local?esc(P.n)+' doit ':'Tu dois '}${fmt(-P.money)} €</div><div class="st">Vends des maisons ou hypothèque des rues pour rembourser, sinon c’est la faillite.</div></div></div>
         <div class="bt"><button class="gb blue" data-ui="props" data-as="${k}">Gérer mes rues</button>${B('Faillite',k,{a:'bankrupt'},'red')}</div></div>`}
-    else if(S.stage==='auction'){const A=S.auc,bw=A.ord[A.i],my=local||bw===me,el=auctionTimer(A);
+    else if(S.stage==='auction'){const A=S.auc,bw=A.ord[A.i],my=ctl(bw),el=auctionTimer(A);
       const ring=S.players.map((P,k)=>P.out?'':`<div class="bidder${k===bw?' on':''}${A.ord.includes(k)?'':' gone'}${k===A.by?' lead':''}" style="--pc:${P.c}">${pav(k,'s')}<span>${esc(P.n)}</span><small>${k===A.by?A.bid+' €':A.ord.includes(k)?(k===bw?'à lui':'en lice'):'passe'}</small></div>`).join('');
       p=`<div class="prompt"><div class="hd" style="justify-content:space-between">${mdeed(A.sq,`valeur ${SQ[A.sq].p} €`)}<div style="text-align:center"><div class="st">Enchère actuelle</div><div class="bid"><span class="coin"></span>${A.bid}</div></div></div>
         <div class="bidders">${ring}</div>
         <div class="timer"><i style="animation-duration:${AUCT}s;animation-delay:-${el.toFixed(2)}s"></i></div>
         <div class="st" style="text-align:center">${my?`<b>${esc(nm(S,bw))}</b>, à toi d’enchérir !`:`${esc(nm(S,bw))} réfléchit…`}</div>
         ${my?`<div class="bt">${[10,50,100].map(d=>B(`+${d} €`,bw,{a:'bid',amt:A.bid+d},'green sm')).join('')}${B('Je passe',bw,{a:'pass'},'white sm')}</div>`:''}</div>`}
-    else if(S.trade&&!local&&S.trade.f===me){const X=S.trade;
-      p=`<div class="prompt wait one"><div class="hd">${av(me)}<div><div class="tt">Offre envoyée à ${esc(nm(S,X.t))}</div><div class="st">On attend sa réponse</div></div></div><div class="bt">${B('Retirer l’offre',me,{a:'cancel'},'white sm')}</div></div>`}
+    else if(S.trade&&ctl(S.trade.f)&&!ctl(S.trade.t)){const X=S.trade;
+      p=`<div class="prompt wait one"><div class="hd">${av(X.f)}<div><div class="tt">Offre envoyée à ${esc(nm(S,X.t))}</div><div class="st">On attend sa réponse</div></div></div><div class="bt">${B('Retirer l’offre',X.f,{a:'cancel'},'white sm')}</div></div>`}
     else if(!mine){
-      const msg=S.stage==='roll'?`${esc(T.n)} lance les dés`:S.stage==='buy'?`${esc(T.n)} hésite à acheter`:`${esc(T.n)} joue son tour`;
-      p=`<div class="prompt wait one"><div class="hd">${av(cur)}<div><div class="tt">${msg}</div><div class="st">${me<0?'Tu regardes la partie en spectateur.':'Profites-en pour regarder tes rues ou préparer un échange.'}</div></div></div></div>`}
+      const msg=T.bot?`${esc(T.n)} réfléchit…`:S.stage==='roll'?`${esc(T.n)} lance les dés`:S.stage==='buy'?`${esc(T.n)} hésite à acheter`:`${esc(T.n)} joue son tour`;
+      p=`<div class="prompt wait one"><div class="hd">${av(cur)}<div><div class="tt">${msg}</div><div class="st">${actor()<0?'Tu regardes la partie en spectateur.':T.bot?'C’est un bot : il joue tout seul. Tu peux gérer tes rues en attendant.':'Profites-en pour regarder tes rues ou préparer un échange.'}</div></div></div></div>`}
     else if(S.stage==='roll'){
       const title=local?`À toi, ${esc(T.n)} !`:'À toi de jouer !';
       p=`<div class="prompt one"><div class="hd">${av(cur)}<div><div class="tt">${title}</div><div class="st">${T.inJail?'Tu es en prison : tente un double, paie 50 € ou utilise ta carte.':S.again?'<b>Double !</b> Tu relances les dés.':'Lance les dés pour avancer.'}</div></div></div>
@@ -2992,7 +3199,11 @@ function renderDock(){
       p=`<div class="prompt one"><div class="hd">${av(cur)}<div><div class="tt">${local?esc(T.n)+', à toi de gérer':'À toi de gérer'}</div><div class="st">Construis, hypothèque ou propose un échange, puis termine ton tour.</div></div></div>
         <div class="bt">${B('Fin du tour <kbd>Espace</kbd>',cur,{a:'end'},'','data-primary="1"')}</div></div>`}
   }
-  const canManage=S.phase==='play'&&(local||me>=0);
+  // en ligne : petit compte à rebours avant qu'on joue à ta place
+  if(mode==='online'&&p&&S.phase==='play'&&S.stage!=='auction'&&BOT.pending(S).some(([k])=>k===me)){const dk=decKey();
+    if(UI.myDk!==dk){UI.myDk=dk;UI.myDkT=performance.now();clearTimeout(UI.myDkH);UI.myDkH=setTimeout(()=>{if(S)renderDock()},(TURN_T-25)*1000+delayNow()*1000)}
+    const el=(performance.now()-UI.myDkT)/1000-delayNow();if(el>TURN_T-25)p=p.replace(/<\/div>$/,`<div class="timer afk"><i style="animation-duration:${TURN_T}s;animation-delay:-${el.toFixed(2)}s"></i></div><div class="st" style="text-align:center">Dépêche-toi : sinon on joue à ta place !</div></div>`)}
+  const canManage=S.phase==='play'&&actor()>=0;
   const nProps=canManage?S.own.filter(w=>w&&w[0]===actor()).length:0;
   const tools=S.phase==='play'?`<div class="tb"><button class="tool" data-ui="props" data-mine="1" ${canManage?'':'disabled'}>${TOOLI.props}<span class="lbl">Propriétés</span>${nProps?`<span class="c">${nProps}</span>`:''}</button>
     <button class="tool" data-ui="trade" ${canManage&&!S.trade&&live(S).length>1?'':'disabled'}>${TOOLI.trade}<span class="lbl">Échanger</span></button><button class="tool" data-ui="log">${TOOLI.log}<span class="lbl">Journal</span></button>${(mode==='online'&&me>=0)||mode==='local'?`<button class="tool" data-react="t" aria-expanded="${!!UI.reactOpen}">${ico('smile')}<span class="lbl">Réagir</span></button>`:''}</div>${UI.reactOpen?`<div class="reacts">${REACTS.map((r,j)=>`<button data-react="${j}" aria-label="Réaction ${r}">${r}</button>`).join('')}</div>`:''}`:'';
@@ -3004,7 +3215,7 @@ function renderDock(){
 function deedActs(i){
   if(S.phase!=='play')return '';const s=SQ[i],w=S.own[i],me=myIdx(),local=mode==='local',a=actor();let h='';
   if(S.stage==='buy'&&S.pend===i&&isMine())h+=B('Acheter',S.turn,{a:'buy'},'green sm')+B('Enchères',S.turn,{a:'decline'},'white sm');
-  else if(w){const mgr=local?w[0]:me;
+  else if(w){const mgr=ctl(w[0])?w[0]:-1;
     if(w[0]===mgr&&mgr>=0){if(s.t==='st'&&ownsAll(S,s.g,mgr))h+=B('+ Maison',mgr,{a:'build',sq:i},'green sm')+B('− Vendre',mgr,{a:'sell',sq:i},'white sm');
       h+=w[2]?B(`Lever ${Math.round(s.p/2*1.1)} €`,mgr,{a:'unmort',sq:i},'blue sm'):B(`Hypothéquer +${s.p/2} €`,mgr,{a:'mort',sq:i},'white sm')}
     if(a>=0&&w[0]!==a&&!S.trade&&tradeable(S,w[0],i))h+=`<button class="gb blue sm" data-tradefor="${i}">Proposer un échange à ${esc(nm(S,w[0]))}</button>`}
@@ -3028,7 +3239,7 @@ function renderCard(){
 function sheet(title,body,cls=''){return `<div class="sheet ${cls}" role="dialog" aria-modal="true" aria-label="${title.replace(/<[^>]+>/g,'')}"><div class="sh"><h2>${title}</h2><button class="x" data-ui="close" aria-label="Fermer">${ico('close')}</button></div><div class="sb">${body}</div></div>`}
 function propsSheet(){
   const local=mode==='local',me=myIdx(),a=actor(),who=UI.as??a;if(who<0||!S.players[who])return '';
-  const canEdit=local||who===me;
+  const canEdit=ctl(who);
   const tabs=`<div class="ptabs">${S.players.map((P,k)=>P.out?'':`<button class="ptab" data-as="${k}" aria-pressed="${k===who}" style="--pc:${P.c}">${pav(k,'s')}${esc(P.n)}${k===me?' (toi)':''}</button>`).join('')}</div>`;
   const mine=S.own.map((w,i)=>({w,i})).filter(x=>x.w&&x.w[0]===who).sort((x,y)=>((SQ[x.i].g??9)-(SQ[y.i].g??9))||x.i-y.i);
   const cards=mine.map(({w,i})=>{const s=SQ[i],full=s.t==='st'&&ownsAll(S,s.g,who);
@@ -3040,28 +3251,30 @@ function propsSheet(){
     return `<div class="pc${w[2]?' mort':''}" data-hsq="${i}"><div class="ph${s.t==='st'&&darkG(s.g)?' dk':''}" style="${gst(i)}"><small>${s.t==='st'?arr(s.ar):s.t==='gr'?'Gare':'Compagnie'}</small>${s.n}</div>
       <div class="pb"><div class="hs">${hs}</div>${rent}${acts?`<div class="pa">${acts}</div>`:''}</div></div>`}).join('');
   const P=S.players[who];
-  return sheet(`${pav(who,'m')}${who===me?'Mes propriétés':'Propriétés de '+esc(P.n)}`,tabs+`<div class="sumline"><span class="coin"></span><b>${fmt(P.money)} €</b> en caisse · fortune totale <b>${fmt(worth(who))} €</b></div>`+
+  return sheet(`${pav(who,'m')}${who===me?'Mes propriétés':'Propriétés de '+esc(P.n)}`,tabs+`<div class="sumline"><span class="coin"></span><b>${fmt(P.money)} €</b> en caisse · fortune totale <b>${fmt(worth(who))} €</b>${P.goj?` · <b>${P.goj}</b> carte${P.goj>1?'s':''} prison`:''}</div><div class="sumline bank">${(()=>{const[h,H]=stock(S);return `Banque : <b>${h}</b> maison${h>1?'s':''} et <b>${H}</b> hôtel${H>1?'s':''} disponibles${h<6?' · <em>pénurie !</em>':''}`})()}</div>`+
     (cards?`<div class="grid">${cards}</div>`:`<div class="emptybox">${who===me?'Tu n’as':esc(P.n)+' n’a'} encore aucune rue.</div>`));
 }
 function tradeSheet(){
-  const local=mode==='local',me=myIdx(),who=local?S.turn:me;if(who<0)return '';
+  const local=mode==='local',me=myIdx(),who=actor();if(who<0)return '';
   const others=live(S).filter(k=>k!==who);if(!others.includes(draft.to))draft.to=others[0]??-1;
   const q=draft.to,myT=S.own.map((w,i)=>i).filter(i=>tradeable(S,who,i)),thT=q>=0?S.own.map((w,i)=>i).filter(i=>tradeable(S,q,i)):[];
   draft.gp=draft.gp.filter(i=>myT.includes(i));draft.rp=draft.rp.filter(i=>thT.includes(i));
   const chip=(i,key,on)=>`<button class="tchip" data-hsq="${i}" data-${key}="${i}" aria-pressed="${on}" style="${gst(i)}"><i></i>${SQ[i].n}</button>`;
   const step=(id,v)=>`<div class="stepper"><label for="${id}">Argent</label><button class="gb white xs" data-step="${id}:-50">−50</button><input type="number" id="${id}" min="0" step="10" value="${v}"><button class="gb white xs" data-step="${id}:50">+50</button></div>`;
-  const P=S.players[who];
+  const P=S.players[who],Q=q>=0?S.players[q]:null;if(!P.goj)draft.gc=0;if(!Q||!Q.goj)draft.rc=0;
+  const gjc=(key,on,n)=>n?`<div class="chips"><button class="tchip gojc" data-gcard="${key}" aria-pressed="${!!on}"><i></i>Carte sortie de prison</button></div>`:'';
   return sheet(`${ico('swap','h')}Échange`,`<div class="who">${others.map(k=>`<button class="ptab" data-tto="${k}" aria-pressed="${k===q}" style="--pc:${S.players[k].c}">${pav(k,'s')}${esc(S.players[k].n)}</button>`).join('')}</div>
-    <div class="trade"><div class="tcol"><h3>${pav(who,'s')}${local?esc(P.n)+' donne':'Tu donnes'}</h3><div class="chips">${myT.map(i=>chip(i,'g',draft.gp.includes(i))).join('')||'<span class="note">Aucune rue échangeable</span>'}</div>${step('tgm',draft.gm)}</div>
-      <div class="tcol"><h3>${q>=0?pav(q,'s'):''}${local?esc(nm(S,who))+' reçoit':'Tu reçois'}</h3><div class="chips">${thT.map(i=>chip(i,'r',draft.rp.includes(i))).join('')||'<span class="note">Aucune rue échangeable</span>'}</div>${step('trm',draft.rm)}</div></div>
-    <div class="bt" style="display:flex;justify-content:center">${B('Envoyer l’offre',who,{a:'propose',to:q,gp:draft.gp,rp:draft.rp,gm:+draft.gm||0,rm:+draft.rm||0},'green')}</div>`);
+    <div class="trade"><div class="tcol"><h3>${pav(who,'s')}${local?esc(P.n)+' donne':'Tu donnes'}</h3><div class="chips">${myT.map(i=>chip(i,'g',draft.gp.includes(i))).join('')||'<span class="note">Aucune rue échangeable</span>'}</div>${gjc('g',draft.gc,P.goj)}${step('tgm',draft.gm)}</div>
+      <div class="tcol"><h3>${q>=0?pav(q,'s'):''}${local?esc(nm(S,who))+' reçoit':'Tu reçois'}</h3><div class="chips">${thT.map(i=>chip(i,'r',draft.rp.includes(i))).join('')||'<span class="note">Aucune rue échangeable</span>'}</div>${gjc('r',draft.rc,Q&&Q.goj)}${step('trm',draft.rm)}</div></div>
+    ${intr(S,draft.gp)+intr(S,draft.rp)?`<p class="note" style="text-align:center">Rue hypothéquée : celui qui la reçoit paie 10 % d’intérêts.</p>`:''}
+    <div class="bt" style="display:flex;justify-content:center">${B('Envoyer l’offre',who,{a:'propose',to:q,gp:draft.gp,rp:draft.rp,gm:+draft.gm||0,rm:+draft.rm||0,gc:draft.gc?1:0,rc:draft.rc?1:0},'green')}</div>`);
 }
 function offerSheet(){const X=S.trade,local=mode==='local',me=myIdx();
-  const list=(ps,m)=>[...ps.map(i=>`<span class="tchip" data-hsq="${i}" style="${gst(i)}"><i></i>${SQ[i].n}</span>`),...(m?[`<span class="tchip"><span class="coin"></span>${m} €</span>`]:[])].join('')||'<span class="note">rien</span>';
+  const list=(ps,m,c)=>[...ps.map(i=>`<span class="tchip" data-hsq="${i}" style="${gst(i)}"><i></i>${SQ[i].n}${S.own[i]&&S.own[i][2]?' (hypothéquée)':''}</span>`),...(c?['<span class="tchip gojc"><i></i>Carte sortie de prison</span>']:[]),...(m?[`<span class="tchip"><span class="coin"></span>${m} €</span>`]:[])].join('')||'<span class="note">rien</span>';
   const A=S.players[X.f],Bp=S.players[X.t];
-  return sheet('Offre d’échange',`<div class="offerbox"><div class="side">${pav(X.f,'l')}<b>${esc(A.n)} donne</b><div class="chips" style="justify-content:center">${list(X.gp,X.gm)}</div></div><div class="arrow">${ico('swap')}</div>
-    <div class="side">${pav(X.t,'l')}<b>${esc(Bp.n)} donne</b><div class="chips" style="justify-content:center">${list(X.rp,X.rm)}</div></div></div>
-    <div class="bt" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">${(local||X.t===me)?B('Accepter',X.t,{a:'accept'},'green')+B('Refuser',X.t,{a:'refuse'},'red'):''}${(local||X.f===me)?B('Retirer l’offre',X.f,{a:'cancel'},'white sm'):''}</div>`,'narrow');
+  return sheet('Offre d’échange',`<div class="offerbox"><div class="side">${pav(X.f,'l')}<b>${esc(A.n)} donne</b><div class="chips" style="justify-content:center">${list(X.gp,X.gm,X.gc)}</div></div><div class="arrow">${ico('swap')}</div>
+    <div class="side">${pav(X.t,'l')}<b>${esc(Bp.n)} donne</b><div class="chips" style="justify-content:center">${list(X.rp,X.rm,X.rc)}</div></div></div>
+    <div class="bt" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">${ctl(X.t)?B('Accepter',X.t,{a:'accept'},'green')+B('Refuser',X.t,{a:'refuse'},'red'):''}${ctl(X.f)?B('Retirer l’offre',X.f,{a:'cancel'},'white sm'):''}</div>`,'narrow');
 }
 function logSheet(){return sheet(`${ico('list','h')}Journal`,`<ul class="loglist">${S.log.map(l=>`<li>${logIcon(l)}<span>${esc(l)}</span></li>`).join('')}</ul>`,'narrow')}
 function statsHTML(){const st=S.st;if(!st)return '';const N=k=>esc(S.players[k].n);
@@ -3087,7 +3300,7 @@ function renderModal(){
   else if(UI.modal==='props')h=propsSheet();
   else if(UI.modal==='trade'&&!S.trade)h=tradeSheet();
   else if(UI.modal==='log')h=logSheet();
-  else if(S.trade&&(local||S.trade.t===me))h=offerSheet();
+  else if(S.trade&&ctl(S.trade.t))h=offerSheet();
   if(UI.modal==='trade'&&S.trade)UI.modal=null;
   const dockr=!!h&&S.phase!=='over'&&!h.startsWith('<div class="pass"')&&UI.modal!=='log'&&innerWidth>=1100;
   const wasHidden=M.hidden;M.hidden=!h;if(h&&wasHidden)setTimeout(focusModal,80);M.classList.toggle('clear',h.startsWith('<div class="pass"'));M.classList.toggle('dockr',dockr);if(M._h!==h){M.innerHTML=h;M._h=h}
@@ -3127,10 +3340,33 @@ function renderHUD(){
   // début de tour : bandeau, ou écran de passage du PC en local
   const tk=S.gid+':'+S.turn+':'+S.phase;
   if(S.phase==='play'&&tk!==UI.turnKey&&S.stage==='roll'){const first=UI.turnKey===null;UI.turnKey=tk;const T=S.players[S.turn],d=delayNow();
-    if(mode==='local'&&!first&&live(S).length>1){clearTimeout(UI.passH);UI.passH=setTimeout(()=>{if(UI.turnKey===tk){UI.passShow=tk;SFX.play('turn');render()}},d*1000+600)}
-    else if(!first||!(G&&G.intro)){if(mode==='online'&&S.turn===myIdx())turnAlert();banner(mode==='local'?`À toi, ${T.n} !`:S.turn===myIdx()?'À toi de jouer !':`Au tour de ${T.n}`,d+.3);SFX.play('turn',d+.3)}}
+    if(ctl(S.turn))UI.lastHum=S.turn;
+    if(mode==='local'&&!first&&humans().length>1&&ctl(S.turn)&&UI.lastPass!==S.turn){UI.lastPass=S.turn;clearTimeout(UI.passH);UI.passH=setTimeout(()=>{if(UI.turnKey===tk){UI.passShow=tk;SFX.play('turn');render()}},d*1000+600)}
+    else if(!first||!(G&&G.intro)){if(mode==='online'&&S.turn===myIdx())turnAlert();if(first&&ctl(S.turn))UI.lastPass=S.turn;banner(mode==='local'?(ctl(S.turn)?`À toi, ${T.n} !`:`Au tour de ${T.n}`):S.turn===myIdx()?'À toi de jouer !':`Au tour de ${T.n}`,d+.3);SFX.play('turn',d+.3)}}
   else if(S.phase!=='play')UI.turnKey=tk;
   events();renderPlates();renderFeed();renderDock();renderModal();renderDeed();renderCard();renderConn();renderTip();
+  try{botTick()}catch(e){console.error(e)}
+}
+/* ---------- bots et joueurs absents : l'hôte (ou le PC en local) joue pour eux ---------- */
+const TURN_T=75;
+const decKey=()=>[S.gid,S.turn,S.stage,S.roll,S.auc?[S.auc.sq,S.auc.i,S.auc.bid,S.auc.ord.length].join('.'):'',S.trade?S.trade.f+'>'+S.trade.t:'',S.players.map(P=>P.money<0?1:0).join(''),S.own.map(w=>w?w.join(''):'').join(',')].join(':');
+function botTick(){
+  if(!S||S.phase!=='play'||!(mode==='local'||isHost)){clearTimeout(UI.botH);UI.botK=null;return}
+  const present=mode==='online'&&groom?new Set(groom.peers().map(x=>x.peer)):null;UI.afkMark=UI.afkMark||{};
+  let best=null;
+  for(const[k,kind]of BOT.pending(S)){const P=S.players[k];if(!P||P.out)continue;
+    if(P.bot){best=[k,kind,'bot'];break}
+    if(mode==='online'&&!best)best=[k,kind,!P.peer||!present.has(P.peer)?'away':UI.afkMark[k]?'away':'afk']}
+  if(!best){clearTimeout(UI.botH);UI.botK=null;return}
+  const key=decKey()+'|'+best.join(',');if(UI.botK===key)return;UI.botK=key;clearTimeout(UI.botH);
+  const[k,kind,why]=best,anim=delayNow()*1000+(G&&G.cardHold?Math.max(0,G.cardHold-performance.now()):0);
+  const wait=why==='bot'?anim+((kind==='auction'?650:kind==='done'?600:950)+Math.random()*400)/SPD():why==='away'?anim+4500:anim+(kind==='auction'?(AUCT+1.5)*1000:TURN_T*1000);
+  UI.botH=setTimeout(()=>{if(!S||UI.botK!==key||S.phase!=='play')return;UI.botK=null;
+    let a=BOT.decide(S,k,kind,{lite:why==='afk',mem:UI.botMem||(UI.botMem={})});
+    const fb={debt:{a:'bankrupt'},trade:{a:'refuse'},auction:{a:'pass'},roll:{a:'roll'},buy:{a:'decline'},done:{a:'end'}}[kind];
+    if(!a||!can(k,a))a=fb;if(!can(k,a)){botTick();return}
+    if(why!=='bot'){UI.afkMark[k]=1;if(!UI.afkTold||UI.afkTold!==k+':'+S.rnd){UI.afkTold=k+':'+S.rnd;toast(why==='afk'?`${S.players[k].n} met trop de temps : on joue pour lui.`:`${S.players[k].n} n’est plus là : un bot joue à sa place.`)}}
+    doAct(k,a)},wait);
 }
 function turnAlert(){if(!document.hidden)return;SFX.play('turn');SFX.play('coin',.45);clearInterval(turnAlert.h);const base='Le Grand Paris';let on=false;
   turnAlert.h=setInterval(()=>{on=!on;document.title=on?'🎲 À toi de jouer !':base},900);
@@ -3163,6 +3399,7 @@ function wireHUD(){
     const sq=e.target.closest('[data-sq]');if(sq){selSq=+sq.dataset.sq;render();return}
     const t=e.target.closest('[data-tto]');if(t){draft.to=+t.dataset.tto;draft.rp=[];render();return}
     const gp=e.target.closest('[data-g]');if(gp){const i=+gp.dataset.g;draft.gp=draft.gp.includes(i)?draft.gp.filter(x=>x!==i):[...draft.gp,i];render();return}
+    const gc=e.target.closest('[data-gcard]');if(gc){const key=gc.dataset.gcard==='g'?'gc':'rc';draft[key]=draft[key]?0:1;render();return}
     const rp=e.target.closest('[data-r]');if(rp){const i=+rp.dataset.r;draft.rp=draft.rp.includes(i)?draft.rp.filter(x=>x!==i):[...draft.rp,i];render();return}
     const st=e.target.closest('[data-step]');if(st){const[id,d]=st.dataset.step.split(':');const key=id==='tgm'?'gm':'rm';draft[key]=Math.max(0,(+draft[key]||0)+ +d);render();return}
     if(e.target.closest('#again')){replay();return}if(e.target.closest('#tomenu'))quitGame();
