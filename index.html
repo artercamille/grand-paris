@@ -1246,7 +1246,7 @@ function homeView(){
     <section class="card"><h2><span class="n">1</span>Invite tes potes</h2>
       <div class="row" style="justify-content:center"><span class="code">${esc(code)}</span></div>
       <div class="row" style="justify-content:center"><button class="gb blue sm" id="invite" type="button">${ico('link')}Copier l’invitation</button><button class="gb white sm" id="copy" type="button">${ico('copy')}Copier le code</button></div>
-      <p class="note">Envoie-leur le lien de cette page et le code : ils mettent leur pseudo, tapent le code et apparaissent ici.</p></section>
+      <p class="note">${SITE?'Copie l’invitation et envoie-la sur Discord : tes potes cliquent sur le lien, se connectent avec Discord, appuient sur Rejoindre et apparaissent ici.':'Envoie-leur le lien de cette page et le code : ils mettent leur pseudo, tapent le code et apparaissent ici.'}</p></section>
     <section class="card"><h2><span class="n">2</span>Joueurs ${ps.length}/6</h2>
       ${me?'<p class="note">Clique sur ton rond pour mettre ta photo, sur le petit pion pour changer de figurine, sur la pastille pour la couleur.</p>'+PFP_HINT:''}
       <div class="slots">${[...Array(6)].map((_,i)=>{const x=ps[i];if(!x)return `<div class="slot empty">${i===ps.length?'En attente…':'Libre'}</div>`;const L=look[i],mine=x.isMe&&x.sameTab;
